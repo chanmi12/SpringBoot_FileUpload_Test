@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -19,15 +18,26 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 255, nullable=false)
+
     private String name;
-    @Column(length = 255, nullable=false , unique=true)
+
     private String email;
     @Column(length = 255, nullable=false)
-    private LocalDateTime createDate = LocalDateTime.now();
+    private LocalDateTime createDate;
 
     @Column(nullable = false)
-    private LocalDateTime updateDate = LocalDateTime.now();
-    private LocalDateTime localDateTime;
+    private LocalDateTime updateDate;
+    private LocalDateTime loginTime;
     private Integer level;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createDate = LocalDateTime.now();
+        this.updateDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updateDate = LocalDateTime.now();
+    }
 }
