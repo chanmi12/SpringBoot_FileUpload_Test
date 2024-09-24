@@ -1,4 +1,4 @@
-package com.example.workfileuploadtest.service;
+package com.example.work.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;

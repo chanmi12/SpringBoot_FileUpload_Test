@@ -1,4 +1,4 @@
-package com.example.workfileuploadtest.config;
+package com.example.work.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

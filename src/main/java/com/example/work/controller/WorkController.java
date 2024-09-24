@@ -1,10 +1,9 @@
-package com.example.workfileuploadtest.controller;
+package com.example.work.controller;
 
-import com.example.workfileuploadtest.entity.Work;
-import com.example.workfileuploadtest.repository.WorkRepository;
-import com.example.workfileuploadtest.service.AwsS3Service;
+import com.example.work.repository.WorkRepository;
+import com.example.work.entity.Work;
+import com.example.work.service.AwsS3Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

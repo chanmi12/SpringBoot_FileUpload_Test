@@ -1,5 +1,7 @@
 package com.example.work;
 
+import com.example.work.entity.Work;
+
 public class WorkMapper {
     public static WorkDto toDto(Work work) {
         WorkDto workDto = new WorkDto();

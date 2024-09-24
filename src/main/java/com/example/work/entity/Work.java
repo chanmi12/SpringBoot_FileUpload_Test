@@ -1,4 +1,4 @@
-package com.example.workfileuploadtest.entity;
+package com.example.work.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "testing")
+@Table(name = "Work")
 @Getter
 @Setter
 public class Work {
