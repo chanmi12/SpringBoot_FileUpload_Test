@@ -1,5 +1,7 @@
 package com.example.work.entity;
 
+import com.example.userWorkItem.UserWorkItem;
+import com.example.workItem.WorkItem;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "Work")
@@ -46,4 +49,8 @@ public class Work {
 
     private LocalDateTime deleteDate;
     private LocalDateTime openDate;
+
+    @OneToMany(mappedBy = "work", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkItem> workItems;
+
 }

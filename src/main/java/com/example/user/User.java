@@ -1,5 +1,6 @@
 package com.example.user;
 
+import com.example.userWorkItem.UserWorkItem;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,6 +31,9 @@ public class User {
     private LocalDateTime updateDate;
     private LocalDateTime loginTime;
     private Integer level;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserWorkItem> userWorkItems; // Link to UserWorkItem
 
     @PrePersist
     protected void onCreate() {
