@@ -1,43 +1,50 @@
 package com.example.workItem;
 
+
+import com.example.user.User;
+import com.example.work.entity.Work;
 import org.springframework.stereotype.Component;
+
+
 
 @Component
 public class WorkItemMapper {
+
     public WorkItemDto toDto(WorkItem workItem) {
-        return new WorkItemDto(
-                workItem.getId(),
-                workItem.getWork().getId(),
-                workItem.getSignId(),
-                workItem.getUserId(),
-                workItem.getType(),
-                workItem.getText(),
-                workItem.getXPosition(),
-                workItem.getYPosition(),
-                workItem.getWidth(),
-                workItem.getHeight(),
-                workItem.getCreateDate(),
-                workItem.getUpdateDate(),
-                workItem.getFree(),
-                workItem.getPage(),
-                workItem.getFontSize(),
-                workItem.getFontStyle()
-        );
+        WorkItemDto dto = new WorkItemDto();
+        dto.setId(workItem.getId());
+        dto.setWorkId(workItem.getWork().getId());
+        dto.setUserId(workItem.getUser().getId());
+        dto.setSignId(workItem.getSignId());
+        dto.setType(workItem.getType());
+        dto.setText(workItem.getText());
+        dto.setXPosition(workItem.getXPosition());
+        dto.setYPosition(workItem.getYPosition());
+        dto.setWidth(workItem.getWidth());
+        dto.setHeight(workItem.getHeight());
+        dto.setFree(workItem.getFree());
+        dto.setPage(workItem.getPage());
+        dto.setFontSize(workItem.getFontSize());
+        dto.setFontStyle(workItem.getFontStyle());
+        return dto;
     }
 
-    public WorkItem toEntity(WorkItemDto workItemDto, WorkItem workItem) {
-        workItem.setSignId(workItemDto.getSignId());
-        workItem.setUserId(workItemDto.getUserId());
-        workItem.setType(workItemDto.getType());
-        workItem.setText(workItemDto.getText());
-        workItem.setXPosition(workItemDto.getXPosition());
-        workItem.setYPosition(workItemDto.getYPosition());
-        workItem.setWidth(workItemDto.getWidth());
-        workItem.setHeight(workItemDto.getHeight());
-        workItem.setFree(workItemDto.getFree());
-        workItem.setPage(workItemDto.getPage());
-        workItem.setFontSize(workItemDto.getFontSize());
-        workItem.setFontStyle(workItemDto.getFontStyle());
+    public WorkItem toEntity(WorkItemDto dto, Work work, User user) {
+        WorkItem workItem = new WorkItem();
+        workItem.setId(dto.getId());
+        workItem.setWork(work);
+        workItem.setUser(user);
+        workItem.setSignId(dto.getSignId());
+        workItem.setType(dto.getType());
+        workItem.setText(dto.getText());
+        workItem.setXPosition(dto.getXPosition());
+        workItem.setYPosition(dto.getYPosition());
+        workItem.setWidth(dto.getWidth());
+        workItem.setHeight(dto.getHeight());
+        workItem.setFree(dto.getFree());
+        workItem.setPage(dto.getPage());
+        workItem.setFontSize(dto.getFontSize());
+        workItem.setFontStyle(dto.getFontStyle());
         return workItem;
     }
 }

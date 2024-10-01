@@ -2,6 +2,7 @@ package com.example.workItem;
 
 import com.example.userWorkItem.UserWorkItem;
 import com.example.work.entity.Work;
+import com.example.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,17 +26,18 @@ public class WorkItem {
     @JoinColumn(name = "workId", nullable = false)
     private Work work; // Work와의 관계 설정
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     // New relationship with UserWorkItem
     @OneToMany(mappedBy = "workItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserWorkItem> userWorkItems; // List of UserWorkItems
 
-    @Column(name = "signId", nullable = false)
+    @Column(name = "signId", nullable = true)
     private Long signId;
 
-    @Column(name = "userId", nullable = false)
-    private Long userId;
-
-    @Column(name = "type", nullable = false)
+    @Column(name = "type", nullable = true)
     private Integer type;
 
     @Column(name = "text", columnDefinition = "TEXT", nullable = true)
@@ -70,6 +72,9 @@ public class WorkItem {
 
     @Column(name = "fontStyle", length = 255, nullable = true)
     private String fontStyle;
+
+    public WorkItem(Work work, User creator) {
+    }
 
 
     @PrePersist
