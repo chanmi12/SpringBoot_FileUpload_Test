@@ -78,7 +78,16 @@ public class WorkItem {
     public WorkItem(Work work, User creator) {
     }
 
+    public WorkItem toEntity(WorkItemDto workItemDto, Work work, User user) {
+        WorkItem workItem = new WorkItem();
+        workItem.setWork(work);
+        workItem.setUser(user);
+        workItem.setSignId(workItemDto.getSignId());
+        workItem.setType(workItemDto.getType() != null ? workItemDto.getType() : 1); // Provide default type if null
+        // Set other fields
 
+        return workItem;
+    }
     @PrePersist
     protected void onCreate() {
         this.createDate = LocalDateTime.now();

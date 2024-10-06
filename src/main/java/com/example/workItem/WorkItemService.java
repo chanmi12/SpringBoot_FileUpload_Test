@@ -46,6 +46,9 @@ public class WorkItemService {
         workItem.setUser(user); // Assign the non-null User
         workItem.setSignId(0L);
 
+        // Ensure the 'type' field is set to a non-null value
+        workItem.setType(1); // Set this to a default type, or derive it from your business logic.
+
         // Save the WorkItem to the repository
         workItemRepository.save(workItem);
 
