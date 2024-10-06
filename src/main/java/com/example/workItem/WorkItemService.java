@@ -2,6 +2,7 @@ package com.example.workItem;
 
 import com.example.user.UserDto;
 import com.example.user.UserRepository;
+import com.example.user.UserService;
 import com.example.work.repository.WorkRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.user.User;
 import com.example.work.entity.Work;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,29 +27,45 @@ public class WorkItemService {
     private UserRepository userRepository;
     @Autowired
     private WorkItemMapper workItemMapper;
+    @Autowired
+    private UserService userService;
 
 
+    @Transactional
+    public WorkItemDto inviteUserToWork(Long workId, UserDto userDto) {
+        // Step 1: Find the work entity by ID
+        Work work = workRepository.findById(workId)
+                .orElseThrow(() -> new IllegalArgumentException("Work not found"));
 
-    public WorkItemDto inviteUserToWork(Long workId, UserDto userDto){ //작업에 새로운 사용자 초대
-        // Step 1: Find the work entity
-        Work work = workRepository.findById(workId).orElseThrow(()-> new IllegalArgumentException("Work not found"));
-        // Step 2: Check if the user already exists by email
-        User user = userRepository.findByEmail(userDto.getEmail()).orElseGet(()->{
-            // Step 3: If the user does not exist, create a new user
-            User newUser = new User();
-            newUser.setName(userDto.getName());
-            newUser.setEmail(userDto.getEmail());
-            return userRepository.save(newUser);
-        });
-        // Step 4: Create the WorkItem for the existing or newly created user
-        WorkItem workItem = new WorkItem(work, user);
-        workItem.setSignId(0L); //나중에 변경 해야함
-        workItem.setType(2); //일반 유저들
-        // Step 5: Save the WorkItem to the repository
+        // Step 2: Find or create the user using UserService
+        User user = userService.findOrCreateUser(userDto);
+
+        // Step 3: Create the WorkItem for the existing or newly created user
+        WorkItem workItem = new WorkItem();
+        workItem.setWork(work);
+        workItem.setUser(user); // Assign the non-null User
+        workItem.setSignId(0L);
+
+        // Save the WorkItem to the repository
         workItemRepository.save(workItem);
-        // Step 6: Return the WorkItemDto
+
+        // Return the WorkItemDto
         return workItemMapper.toDto(workItem);
     }
+    public WorkItem createWorkItem(WorkItemDto workItemDto, Long workId, Long userId) {
+        // Retrieve Work and User from their respective services or repositories
+        Work work = workRepository.findById(workId)
+                .orElseThrow(() -> new RuntimeException("Work not found with id: " + workId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        // Call toEntity with the required parameters
+        WorkItem workItem = workItemMapper.toEntity(workItemDto, work, user);
+
+        // Save the workItem
+        return workItemRepository.save(workItem);
+    }
+
 
     public List<WorkItemDto> findByWorkId(Long workId){ //특정 작업에 대한 모든 작업 항목 가져오기
         // Step 1: Find all WorkItems by workId
@@ -64,13 +82,16 @@ public class WorkItemService {
         return workItemRepository.save(workItem);
     }
 
-    public List<UserDto> listUniqueUsersForWork(Long workId){  //작업에 초대된 모든 고유 사용자 나열(중복 없음)
+    public List<UserDto> listUniqueUsersForWork(Long workId) {
+        // Find all WorkItems for the specified workId
         List<WorkItem> workItems = workItemRepository.findByWorkId(workId);
+
+        // Map the WorkItem list to users, ensure no duplicates
         return workItems.stream()
-                .map(WorkItem :: getUser)
-                .distinct()
-                .map(user -> new UserDto(user.getId(), user.getName(), user.getEmail()))
-                .collect(Collectors.toList());
+                .map(WorkItem::getUser) // Extract user from each WorkItem
+                .distinct() // Ensure distinct users
+                .map(user -> new UserDto(user.getId(), user.getName(), user.getEmail())) // Convert User to UserDto
+                .collect(Collectors.toList()); // Collect as a list of UserDto
     }
 
     public WorkItemDto updateWorkItem(Long workItemId, WorkItemDto workItemDto){ //ID로 작업 항목 업데이트
@@ -101,4 +122,10 @@ public class WorkItemService {
         }
          workItemRepository.deleteById(workItemId);
     }
+
+    public List<WorkItem> getWorkItemsByWorkIdAndOtherUserId(Long workId, Long otherId) {//특정 작업에 대한 특정 사용자의 모든 작업 항목 가져오기
+        return workItemRepository.findByWorkIdAndOtherUserId(workId, otherId);
+
+    }
+
 }

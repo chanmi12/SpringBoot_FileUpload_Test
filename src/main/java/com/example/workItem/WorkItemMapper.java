@@ -29,7 +29,7 @@ public class WorkItemMapper {
         return dto;
     }
 
-    public WorkItem toEntity(WorkItemDto dto, Work work, User user) {
+    public static WorkItem toEntity(WorkItemDto dto, Work work, User user) {
         WorkItem workItem = new WorkItem();
         workItem.setId(dto.getId());
         workItem.setWork(work);
@@ -47,4 +47,6 @@ public class WorkItemMapper {
         workItem.setFontStyle(dto.getFontStyle());
         return workItem;
     }
+
+
 }

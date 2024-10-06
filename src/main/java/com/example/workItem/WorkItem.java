@@ -3,6 +3,7 @@ package com.example.workItem;
 import com.example.userWorkItem.UserWorkItem;
 import com.example.work.entity.Work;
 import com.example.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +24,8 @@ public class WorkItem {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "workId", nullable = false)
+    @JoinColumn(name = "work_id", nullable = false)
+    @JsonIgnore
     private Work work; // Work와의 관계 설정
 
     @ManyToOne
@@ -34,8 +36,8 @@ public class WorkItem {
     @OneToMany(mappedBy = "workItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserWorkItem> userWorkItems; // List of UserWorkItems
 
-    @Column(name = "signId", nullable = true)
-    private Long signId;
+    @Column(name = "sign_id", nullable = true)
+    private Long signId = 0L;
 
     @Column(name = "type", nullable = true)
     private Integer type;
@@ -43,10 +45,10 @@ public class WorkItem {
     @Column(name = "text", columnDefinition = "TEXT", nullable = true)
     private String text;
 
-    @Column(name = "xPosition", nullable = true)
+    @Column(name = "x_position", nullable = true)
     private Integer xPosition;
 
-    @Column(name = "yPosition", nullable = true)
+    @Column(name = "y_position", nullable = true)
     private Integer yPosition;
 
     @Column(name = "width", nullable = true)

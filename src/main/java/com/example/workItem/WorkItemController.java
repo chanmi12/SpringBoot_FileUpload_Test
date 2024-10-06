@@ -1,49 +1,67 @@
 package com.example.workItem;
 
+import com.example.user.UserDto;
+import com.example.user.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.example.user.User;
-import com.example.work.entity.Work;
+
 import java.util.List;
 
+
 @RestController
-@RequestMapping("/api/{userId}/{workId}/work")
+@RequestMapping("/api")
 public class WorkItemController {
 
-//    private final WorkItemService workItemService;
-//
-//    public WorkItemController(WorkItemService workItemService) {
-//        this.workItemService = workItemService;
-//    }
-//
-//    @PostMapping
-//    public ResponseEntity<WorkItemDto> createWorkItem(@RequestBody WorkItemDto workItemDto,
-//                                                      @PathVariable Long userId,
-//                                                      @PathVariable Long workId) {
-//        // Retrieve User and Work from their respective services/repositories.
-//        User user = getUserById(userId); // Pseudo code
-//        Work work = getWorkById(workId); // Pseudo code
-//        WorkItemDto createdWorkItem = workItemService.createWorkItem(workItemDto, user, work);
-//        return ResponseEntity.ok(createdWorkItem);
-//    }
-//
-//    @GetMapping("/{workItemId}")
-//    public ResponseEntity<WorkItemDto> getWorkItem(@PathVariable Long workItemId,
-//                                                   @PathVariable Long userId,
-//                                                   @PathVariable Long workId) {
-//        // Retrieve User and Work from their respective services/repositories.
-//        User user = getUserById(userId); // Pseudo code
-//        Work work = getWorkById(workId); // Pseudo code
-//        WorkItemDto workItem = workItemService.getWorkItem(workItemId, user, work);
-//        return ResponseEntity.ok(workItem);
-//    }
-//
-//    // Helper methods to fetch User and Work (you would need to implement these)
-//    private User getUserById(Long userId) {
-//        // Implement logic to fetch User
-//    }
-//
-//    private Work getWorkById(Long workId) {
-//        // Implement logic to fetch Work
-//    }
+    @Autowired
+    private WorkItemService workItemService;
+    @Autowired
+    private UserService userService;
+
+    //workId에 해당하는 work에 userDto를 초대
+    @PostMapping("/{userId}/{workId}/workItem/invite")
+    public ResponseEntity<WorkItemDto> inviteUserToWork(@PathVariable Long workId, @RequestBody UserDto userDto) {
+        WorkItemDto workItemDto = workItemService.inviteUserToWork(workId, userDto);
+        return ResponseEntity.ok(workItemDto);
+    }
+
+    //workId에 해당하는 work에 속한 workItem 생성
+    @PostMapping("/{userId}/{workId}/workItem")
+    public ResponseEntity<WorkItem> createWorkItem(@PathVariable Long userId, @PathVariable Long workId, @RequestBody WorkItemDto workItemDto) {
+        WorkItem workItem = workItemService.createWorkItem(workItemDto, workId, userId);
+        return ResponseEntity.ok(workItem);
+    }
+
+    // 특정 Work의 모든 WorkItem 조회
+    @GetMapping("/{userId}/{workId}/workItem")
+    public ResponseEntity<List<WorkItemDto>> getAllWorkItemsForWork(@PathVariable Long workId) {
+        List<WorkItemDto> workItems = workItemService.findByWorkId(workId);
+        return ResponseEntity.ok(workItems);
+    }
+    @GetMapping("/{userId}/{workId}/workItem/{otherId}") //특정 Work에 속한 특정 User의 WorkItem 조회
+    public ResponseEntity<List<WorkItem>> getWorkItemsByWorkIdAndOtherUserId(@PathVariable Long workId, @PathVariable Long otherId) {
+        List<WorkItem> workItems = workItemService.getWorkItemsByWorkIdAndOtherUserId(workId, otherId);
+        return ResponseEntity.ok(workItems);
+    }
+
+    @GetMapping("/{userId}/{workId}/workItem/users")
+    public ResponseEntity<List<UserDto>> getUsersForWork(@PathVariable Long workId) {
+        List<UserDto> users = workItemService.listUniqueUsersForWork(workId);
+        return ResponseEntity.ok(users);
+    }
+    @PutMapping("/{userId}/{workId}/workItem/{workItemId}") //WorkItem 수정
+    public ResponseEntity<WorkItemDto> updateWorkItem(@PathVariable Long workItemId, @RequestBody WorkItemDto workItemDto) {
+        WorkItemDto updatedWorkItem = workItemService.updateWorkItem(workItemId, workItemDto);
+        return ResponseEntity.ok(updatedWorkItem);
+    }
+
+    //workId에 해당하는 work에 속한 workItem 삭제
+    @DeleteMapping("/{userId}/{workId}/workItem/{workItemId}")
+    public ResponseEntity<Void> deleteWorkItem(@PathVariable Long workItemId) {
+        workItemService.deleteWorkItem(workItemId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
