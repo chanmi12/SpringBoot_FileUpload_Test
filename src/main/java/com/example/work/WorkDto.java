@@ -23,8 +23,8 @@ public class WorkDto {
     private Boolean trashed;
     private Boolean finish;
     private LocalDateTime createDate;
+    private LocalDateTime updateDate;
     private LocalDateTime openDate;
+    private LocalDateTime deleteDate;
 
-    public void setUpdateDate(LocalDateTime updateDate) {
-    }
 }

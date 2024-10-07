@@ -19,6 +19,7 @@ public class UserDto {
     private LocalDateTime loginTime;
     private Integer level;
 
+
     public UserDto(Long id, String name, String email) {
         this.id = id;
         this.name = name;
