@@ -67,19 +67,12 @@ public class WorkItemController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{userId}/{workId}/workItem/{invitedUserId}") //특정 Work에 속한 특정 User의 WorkItem 삭제
-    public ResponseEntity<String> deleteWorkItemsForUserFromWork(@PathVariable Long userId,
-                                                                 @PathVariable Long workId,
-                                                                 @PathVariable Long invitedUserId
-    ) {
-        //권한 설정
-//        if (!workService.isUserAuthorized(userId, workId)) {
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-//                    .body("You are not authorized to perform this action.");
-//        }
+    @DeleteMapping("/{userId}/{workId}/workItems")
+    public ResponseEntity<String> deleteWorkItemsForUserFromWork(
+            @PathVariable Long userId,
+            @PathVariable Long workId) {
 
-        workItemService.deleteWorkItemsByUserAndWork(workId, invitedUserId);
-
-        return ResponseEntity.ok("WorkItems for invited user " + invitedUserId + " in work " + workId + " have been deleted.");
+        workItemService.deleteWorkItemsByUserAndWork(userId, workId);
+        return ResponseEntity.ok("Work items deleted for the user in this work");
     }
 }

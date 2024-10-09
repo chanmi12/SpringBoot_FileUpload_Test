@@ -18,5 +18,5 @@ public interface WorkItemRepository extends JpaRepository<WorkItem,Long> {
     List<WorkItem> findByWorkIdAndOtherUserId(@Param("workId") Long workId, @Param("otherId") Long otherId);
 
     List<WorkItem> findByWorkIdAndUserId(Long workId, Long userId);
-
+    List<WorkItem> findByUserIdAndWorkId(Long userId, Long workId);
 }
