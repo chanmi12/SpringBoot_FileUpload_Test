@@ -4,6 +4,8 @@ import com.example.work.WorkDto;
 import com.example.work.WorkMapper;
 import com.example.work.entity.Work;
 import com.example.work.repository.WorkRepository;
+import com.example.workItem.WorkItem;
+import com.example.workItem.WorkItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
