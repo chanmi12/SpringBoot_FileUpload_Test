@@ -22,8 +22,9 @@ public class Sign {
      @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "user_id", nullable = false)
      private User user;
-    @Column(nullable = false)
-    private String path;
+     @Column(nullable = false)
+     private String path;
+
     private boolean saved;
     private boolean deleted;
     private LocalDateTime createDate;
