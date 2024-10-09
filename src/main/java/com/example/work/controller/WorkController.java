@@ -1,9 +1,6 @@
 package com.example.work.controller;
 
 import com.example.work.WorkDto;
-import com.example.work.repository.WorkRepository;
-import com.example.work.entity.Work;
-import com.example.work.service.AwsS3Service;
 import com.example.work.service.WorkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,8 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
-
 
 
 @RestController
