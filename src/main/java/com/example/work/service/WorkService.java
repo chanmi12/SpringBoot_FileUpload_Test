@@ -6,6 +6,7 @@ import com.example.work.entity.Work;
 import com.example.work.repository.WorkRepository;
 import com.example.workItem.WorkItem;
 import com.example.workItem.WorkItemRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,17 +27,6 @@ public class WorkService {
     private WorkMapper workMapper;
 
     //Work 업로드
-//    public String uploadWork(Long userId, MultipartFile file, String name ){
-//        String fileUrl = awsS3Service.uploadFile(file);
-//
-//        Work work = new Work();
-//        work.setUserId(userId);
-//        work.setName(name);
-//        work.setPath(fileUrl);
-//
-//        workRepository.save(work);
-//        return "File upload successfully. Work ID: " + work.getId();
-//    }
 public String uploadWork(Long userId, MultipartFile file, String name) {
     if(file.isEmpty()){
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty");
@@ -63,22 +53,23 @@ public String uploadWork(Long userId, MultipartFile file, String name) {
         Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
         return workOpt.map(workMapper::toDto).orElse(null);
     }
-    //Work 수정
-    public String updateWork(Long userId, Long workId, MultipartFile file, String name) {
+    //Work 파일 업데이트
+    public String updateWorkFile(Long workId, Long userId, MultipartFile file) {
         Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
-        if (workOpt.isPresent()) {
-            Work work = workOpt.get();
-
-            awsS3Service.deleteFileFromS3(work.getPath()); // Delete old file
-            String newFileUrl = awsS3Service.uploadFile("file",file);
-
-            work.setName(name);
-            work.setPath(newFileUrl);
-
-            workRepository.save(work);
-            return "Work ID: " + workId + " updated successfully.";
+        if (!workOpt.isPresent()) {
+            throw new IllegalArgumentException("Work not found for given id and user");
         }
-        return null;
+        Work existingWork = workOpt.get();
+
+        // Remove the old file from S3
+        awsS3Service.deleteFileFromS3(existingWork.getPath());
+
+        // Upload the new file and update the path
+        String newFileUrl = awsS3Service.uploadFile("file", file);
+        existingWork.setPath(newFileUrl);
+        workRepository.save(existingWork);
+
+        return newFileUrl;
     }
 
     //Work 삭제
@@ -102,18 +93,61 @@ public String uploadWork(Long userId, MultipartFile file, String name) {
                 .map(workMapper::toDto)
                 .collect(Collectors.toList());
     }
-    //Work 공유 상태 변경
-    public String updateWorkSharedStatus (Long userId , Long workId, boolean sharedStatus){
-        Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
-        if (workOpt.isPresent()) {
 
-            Work work = workOpt.get();
-            work.setShared(sharedStatus);
-            workRepository.save(work);
-            return "Work ID: " + workId + " shared status updated to : " + sharedStatus;
-        }else{
-            throw new IllegalArgumentException("Work ID: " + workId + " not found");
+//    //Work 공유 상태 변경
+//    public String updateWorkSharedStatus (Long userId , Long workId, boolean sharedStatus){
+//        Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
+//        if (workOpt.isPresent()) {
+//
+//            Work work = workOpt.get();
+//            work.setShared(sharedStatus);
+//            workRepository.save(work);
+//            return "Work ID: " + workId + " shared status updated to : " + sharedStatus;
+//        }else{
+//            throw new IllegalArgumentException("Work ID: " + workId + " not found");
+//        }
+//    }
+
+    //Work 부분 수정
+    @Transactional
+    public WorkDto updateWork(Long workId, Long userId, WorkDto workDto) {
+        Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
+        if (!workOpt.isPresent()) {
+            throw new IllegalArgumentException("Work not found for given id and user");
         }
+        Work existingWork = workOpt.get();
+
+        if (workDto.getName() != null) {
+            existingWork.setName(workDto.getName());
+        }
+        if (workDto.getPath() != null) {
+            existingWork.setPath(workDto.getPath());
+        }
+        if (workDto.getXSize() != null) {
+            existingWork.setXSize(workDto.getXSize());
+        }
+        if (workDto.getYSize() != null) {
+            existingWork.setYSize(workDto.getYSize());
+        }
+        if (workDto.getShared() != null) {
+            existingWork.setShared(workDto.getShared());
+        }
+        if (workDto.getTrashed() != null) {
+            existingWork.setTrashed(workDto.getTrashed());
+        }
+        if (workDto.getFinish() != null) {
+            existingWork.setFinish(workDto.getFinish());
+        }
+        if (workDto.getOpenDate() != null) {
+            existingWork.setOpenDate(workDto.getOpenDate());
+        }
+        if (workDto.getDeleteDate() != null) {
+            existingWork.setDeleteDate(workDto.getDeleteDate());
+        }
+
+        workRepository.save(existingWork);
+        return workMapper.toDto(existingWork);
     }
+
 
 }

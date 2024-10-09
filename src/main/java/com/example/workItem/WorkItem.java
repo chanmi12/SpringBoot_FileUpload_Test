@@ -76,6 +76,8 @@ public class WorkItem {
     private String fontStyle;
 
     public WorkItem(Work work, User creator) {
+        this.work = work;
+        this.user = creator;
     }
 
     public WorkItem toEntity(WorkItemDto workItemDto, Work work, User user) {

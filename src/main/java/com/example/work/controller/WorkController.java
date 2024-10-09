@@ -57,19 +57,26 @@ public class WorkController{
                 : ResponseEntity.status(404).build();
     }
 
-    //파일 수정 ( Update )
-    @PutMapping ("/{userId}/works/{id}/update")
-    public ResponseEntity<String> updateWorkFile(
-        @PathVariable Long userId,
-        @PathVariable Long id,
-        @RequestParam("file") MultipartFile file,
-        @RequestParam("name") String name) {
-        try {
-            String message = workService.updateWork(userId, id, file, name);
-            return ResponseEntity.ok(message);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update file: " + e.getMessage());
+    //Work 부분 수정 ( Update )
+    @PutMapping("/{userId}/works/{workId}/update")
+    public ResponseEntity<WorkDto> updateWork(@PathVariable Long userId,
+                                              @PathVariable Long workId,
+                                              @RequestBody WorkDto workDto) {
+        WorkDto updatedWork = workService.updateWork(workId, userId, workDto);
+        return ResponseEntity.ok(updatedWork);
+    }
+
+    //Work 파일 수정 ( Update )
+    @PutMapping("/{userId}/works/{workId}/updateFile")
+    public ResponseEntity<String> updateWorkFile(@PathVariable Long userId,
+                                                 @PathVariable Long workId,
+                                                 @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("File is empty");
         }
+
+        String fileUrl = workService.updateWorkFile(workId, userId, file);
+        return ResponseEntity.ok("File updated successfully. New File URL: " + fileUrl);
     }
 
     //파일 삭제 (Delete)
@@ -89,19 +96,8 @@ public class WorkController{
         List<WorkDto> works = workService.getAllWorks();
         return ResponseEntity.ok(works);
     }
-    //
-    @PutMapping("/{userId}/works/{id}/shared")
-    public ResponseEntity<String> updateWorkSharedStatus(
-            @PathVariable Long userId,
-            @PathVariable Long id,
-            @RequestParam("shared") boolean sharedStatus) {
-        try{
-            String message = workService.updateWorkSharedStatus(userId, id, sharedStatus);
-            return ResponseEntity.ok(message);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
+
+
 }
 /* 이전 버전
 @RestController
