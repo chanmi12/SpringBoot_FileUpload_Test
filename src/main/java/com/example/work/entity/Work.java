@@ -55,6 +55,7 @@ public class Work {
     protected void onCreate() {
         this.createDate = LocalDateTime.now();
         this.updateDate = LocalDateTime.now();
+        this.openDate = LocalDateTime.now();
         this.shared = false;
         this.trashed = false;
         this.finish = false;
