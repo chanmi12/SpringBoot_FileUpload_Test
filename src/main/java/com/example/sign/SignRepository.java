@@ -8,5 +8,8 @@ import java.util.Optional;
 
 @Repository
 public interface SignRepository extends JpaRepository<Sign, Long> {
+    // Find a Sign by its id and user id
+    Optional<Sign> findByIdAndUserId(Long id, Long userId);
+    // Find all signs by user id and where deleted is false
     List<Sign> findByUserIdAndDeletedFalse(Long userId);
 }

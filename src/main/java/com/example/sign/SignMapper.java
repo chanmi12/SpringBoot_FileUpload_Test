@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SignMapper {
 
-    public static SignDto toDto(Sign sign) {
+    public SignDto toDto(Sign sign) {
         SignDto signDto = new SignDto();
         sign.setId(sign.getId());
         signDto.setId(sign.getId());
