@@ -21,13 +21,11 @@ public class SignService {
     @Autowired
     private UserRepository userRepository;
 
-    public String createSign (Long userId, SignDto signDto, MultipartFile file){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        String fileUrl = awsS3Service.uploadFile("sign",file);
-
-
-    }
+//    public String createSign (Long userId, SignDto signDto, MultipartFile file){
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+//
+//        String fileUrl = awsS3Service.uploadFile("sign",file);
+//}
 
 }
