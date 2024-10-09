@@ -61,10 +61,10 @@ public String uploadWork(Long userId, MultipartFile file, String name) {
         }
         Work existingWork = workOpt.get();
 
-        // Remove the old file from S3
+        //S3에서 기존 파일 삭제
         awsS3Service.deleteFileFromS3(existingWork.getPath());
 
-        // Upload the new file and update the path
+        //새로운 파일 업로드
         String newFileUrl = awsS3Service.uploadFile("file", file);
         existingWork.setPath(newFileUrl);
         workRepository.save(existingWork);
