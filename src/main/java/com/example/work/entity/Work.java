@@ -63,5 +63,6 @@ public class Work {
     @PreUpdate
     protected void onUpdate() {
         this.updateDate = LocalDateTime.now();
+
     }
 }

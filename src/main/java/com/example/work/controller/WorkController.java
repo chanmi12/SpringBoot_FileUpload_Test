@@ -26,19 +26,6 @@ public class WorkController{
 
     //파일업로드 (create)
     @PostMapping ("/{userId}/works/upload")
-//    public ResponseEntity<String> uploadWork(
-//            @PathVariable Long userId,
-//            @RequestParam("file") MultipartFile file,
-//            @RequestParam("name") String name) {
-//
-//        if(file.isEmpty()){
-//            return ResponseEntity.badRequest().body("File is empty");
-//        }
-//
-//        String message = workService.uploadWork(userId, file, name);
-//
-//        return ResponseEntity.ok(message);
-//    }
     public ResponseEntity<String> uploadWork(
             @PathVariable Long userId,
             @RequestParam("file") MultipartFile file,
@@ -72,18 +59,7 @@ public class WorkController{
 
     //파일 수정 ( Update )
     @PutMapping ("/{userId}/works/{id}/update")
-//    public ResponseEntity<String> updateWorkFile(
-//            @PathVariable Long userId,
-//            @PathVariable Long id,
-//            @RequestParam("file") MultipartFile file,
-//            @RequestParam("name") String name) {
-//
-//        String message = workService.updateWork(userId, id, file, name);
-//        return message != null
-//                ? ResponseEntity.ok(message)
-//                : ResponseEntity.status(404).body("Work ID " + id + " not found for user " + userId);
-//    }
-public ResponseEntity<String> updateWorkFile(
+    public ResponseEntity<String> updateWorkFile(
         @PathVariable Long userId,
         @PathVariable Long id,
         @RequestParam("file") MultipartFile file,
@@ -112,6 +88,19 @@ public ResponseEntity<String> updateWorkFile(
     public ResponseEntity<List<WorkDto>> getAllWorks() {
         List<WorkDto> works = workService.getAllWorks();
         return ResponseEntity.ok(works);
+    }
+    //
+    @PutMapping("/{userId}/works/{id}/shared")
+    public ResponseEntity<String> updateWorkSharedStatus(
+            @PathVariable Long userId,
+            @PathVariable Long id,
+            @RequestParam("shared") boolean sharedStatus) {
+        try{
+            String message = workService.updateWorkSharedStatus(userId, id, sharedStatus);
+            return ResponseEntity.ok(message);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }
 /* 이전 버전

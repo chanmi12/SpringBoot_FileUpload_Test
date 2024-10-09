@@ -102,4 +102,18 @@ public String uploadWork(Long userId, MultipartFile file, String name) {
                 .map(workMapper::toDto)
                 .collect(Collectors.toList());
     }
+    //Work 공유 상태 변경
+    public String updateWorkSharedStatus (Long userId , Long workId, boolean sharedStatus){
+        Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
+        if (workOpt.isPresent()) {
+
+            Work work = workOpt.get();
+            work.setShared(sharedStatus);
+            workRepository.save(work);
+            return "Work ID: " + workId + " shared status updated to : " + sharedStatus;
+        }else{
+            throw new IllegalArgumentException("Work ID: " + workId + " not found");
+        }
+    }
+
 }
