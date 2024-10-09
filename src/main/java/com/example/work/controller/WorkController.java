@@ -26,20 +26,30 @@ public class WorkController{
 
     //파일업로드 (create)
     @PostMapping ("/{userId}/works/upload")
+//    public ResponseEntity<String> uploadWork(
+//            @PathVariable Long userId,
+//            @RequestParam("file") MultipartFile file,
+//            @RequestParam("name") String name) {
+//
+//        if(file.isEmpty()){
+//            return ResponseEntity.badRequest().body("File is empty");
+//        }
+//
+//        String message = workService.uploadWork(userId, file, name);
+//
+//        return ResponseEntity.ok(message);
+//    }
     public ResponseEntity<String> uploadWork(
             @PathVariable Long userId,
             @RequestParam("file") MultipartFile file,
             @RequestParam("name") String name) {
-
-        if(file.isEmpty()){
-            return ResponseEntity.badRequest().body("File is empty");
+        try {
+            String message = workService.uploadWork(userId, file, name);
+            return ResponseEntity.ok(message);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file: " + e.getMessage());
         }
-
-        String message = workService.uploadWork(userId, file, name);
-
-        return ResponseEntity.ok(message);
     }
-
 
     // 유저의 파일 목록 조회 (Read)
     @GetMapping("/{userId}/works/list")
@@ -62,16 +72,28 @@ public class WorkController{
 
     //파일 수정 ( Update )
     @PutMapping ("/{userId}/works/{id}/update")
-    public ResponseEntity<String> updateWorkFile(
-            @PathVariable Long userId,
-            @PathVariable Long id,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("name") String name) {
-
-        String message = workService.updateWork(userId, id, file, name);
-        return message != null
-                ? ResponseEntity.ok(message)
-                : ResponseEntity.status(404).body("Work ID " + id + " not found for user " + userId);
+//    public ResponseEntity<String> updateWorkFile(
+//            @PathVariable Long userId,
+//            @PathVariable Long id,
+//            @RequestParam("file") MultipartFile file,
+//            @RequestParam("name") String name) {
+//
+//        String message = workService.updateWork(userId, id, file, name);
+//        return message != null
+//                ? ResponseEntity.ok(message)
+//                : ResponseEntity.status(404).body("Work ID " + id + " not found for user " + userId);
+//    }
+public ResponseEntity<String> updateWorkFile(
+        @PathVariable Long userId,
+        @PathVariable Long id,
+        @RequestParam("file") MultipartFile file,
+        @RequestParam("name") String name) {
+        try {
+            String message = workService.updateWork(userId, id, file, name);
+            return ResponseEntity.ok(message);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update file: " + e.getMessage());
+        }
     }
 
     //파일 삭제 (Delete)

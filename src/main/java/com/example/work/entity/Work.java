@@ -30,14 +30,12 @@ public class Work {
     private Integer xSize;
     private Integer ySize;
 
-    @Column(columnDefinition = "boolean default false")
-    private Boolean shared = false;
 
-    @Column(columnDefinition = "boolean default false")
-    private Boolean trashed = false;
+    private Boolean shared;
 
-    @Column(columnDefinition = "boolean default false")
-    private Boolean finish = false;
+    private Boolean trashed;
+
+    private Boolean finish;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -53,4 +51,17 @@ public class Work {
     @OneToMany(mappedBy = "work", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkItem> workItems;
 
+    @PrePersist
+    protected void onCreate() {
+        this.createDate = LocalDateTime.now();
+        this.updateDate = LocalDateTime.now();
+        this.shared = false;
+        this.trashed = false;
+        this.finish = false;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updateDate = LocalDateTime.now();
+    }
 }

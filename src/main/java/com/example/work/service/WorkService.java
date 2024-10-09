@@ -7,8 +7,10 @@ import com.example.work.repository.WorkRepository;
 import com.example.workItem.WorkItem;
 import com.example.workItem.WorkItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,18 +26,31 @@ public class WorkService {
     private WorkMapper workMapper;
 
     //Work 업로드
-    public String uploadWork(Long userId, MultipartFile file, String name ){
-        String fileUrl = awsS3Service.uploadFile(file);
-
+//    public String uploadWork(Long userId, MultipartFile file, String name ){
+//        String fileUrl = awsS3Service.uploadFile(file);
+//
+//        Work work = new Work();
+//        work.setUserId(userId);
+//        work.setName(name);
+//        work.setPath(fileUrl);
+//
+//        workRepository.save(work);
+//        return "File upload successfully. Work ID: " + work.getId();
+//    }
+public String uploadWork(Long userId, MultipartFile file, String name) {
+    if(file.isEmpty()){
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty");
+    }
+    //파일 업로드
+        String fileUrl = awsS3Service.uploadFile("file", file);
         Work work = new Work();
         work.setUserId(userId);
         work.setName(name);
         work.setPath(fileUrl);
-
         workRepository.save(work);
-        return "File upload successfully. Work ID: " + work.getId();
-    }
 
+        return "File uploaded successfully. Work ID: " + work.getId();
+}
     //유저의 Work 목록 조회
     public List<WorkDto> getUserWorks(Long userId){
         List<Work> works = workRepository.findByUserId(userId);
@@ -55,7 +70,7 @@ public class WorkService {
             Work work = workOpt.get();
 
             awsS3Service.deleteFileFromS3(work.getPath()); // Delete old file
-            String newFileUrl = awsS3Service.uploadFile(file);
+            String newFileUrl = awsS3Service.uploadFile("file",file);
 
             work.setName(name);
             work.setPath(newFileUrl);
