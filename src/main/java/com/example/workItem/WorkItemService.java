@@ -131,4 +131,13 @@ public class WorkItemService {
 
     }
 
+    public void deleteWorkItemsByUserAndWork(Long workId, Long invitedUserId){ //특정 작업에 대한 특정 사용자의 모든 작업 항목 삭제
+        List<WorkItem> workItems = workItemRepository.findByWorkIdAndUserId(workId, invitedUserId);
+
+        if (workItems.isEmpty()) {
+            throw new IllegalArgumentException("No WorkItems found for the user in this work.");
+        }
+
+        workItemRepository.deleteAll(workItems);
+    }
 }

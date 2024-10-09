@@ -2,6 +2,7 @@ package com.example.workItem;
 
 import com.example.user.UserDto;
 import com.example.user.UserService;
+import com.example.work.service.WorkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,8 @@ public class WorkItemController {
     private WorkItemService workItemService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private WorkService workService;
 
     //workId에 해당하는 work에 userDto를 초대
     @PostMapping("/{userId}/{workId}/workItem/invite")
@@ -46,7 +49,7 @@ public class WorkItemController {
         return ResponseEntity.ok(workItems);
     }
 
-    @GetMapping("/{userId}/{workId}/workItem/users")
+    @GetMapping("/{userId}/{workId}/workItem/users") //특정 Work에 속한 모든 User 조회
     public ResponseEntity<List<UserDto>> getUsersForWork(@PathVariable Long workId) {
         List<UserDto> users = workItemService.listUniqueUsersForWork(workId);
         return ResponseEntity.ok(users);
@@ -64,5 +67,19 @@ public class WorkItemController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{userId}/{workId}/workItem/{invitedUserId}") //특정 Work에 속한 특정 User의 WorkItem 삭제
+    public ResponseEntity<String> deleteWorkItemsForUserFromWork(@PathVariable Long userId,
+                                                                 @PathVariable Long workId,
+                                                                 @PathVariable Long invitedUserId
+    ) {
+        //권한 설정
+//        if (!workService.isUserAuthorized(userId, workId)) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+//                    .body("You are not authorized to perform this action.");
+//        }
 
+        workItemService.deleteWorkItemsByUserAndWork(workId, invitedUserId);
+
+        return ResponseEntity.ok("WorkItems for invited user " + invitedUserId + " in work " + workId + " have been deleted.");
+    }
 }

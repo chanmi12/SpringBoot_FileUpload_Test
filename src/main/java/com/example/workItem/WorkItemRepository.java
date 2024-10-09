@@ -17,4 +17,6 @@ public interface WorkItemRepository extends JpaRepository<WorkItem,Long> {
     @Query("SELECT wi FROM WorkItem wi WHERE wi.work.id = :workId AND wi.user.id = :otherId")
     List<WorkItem> findByWorkIdAndOtherUserId(@Param("workId") Long workId, @Param("otherId") Long otherId);
 
+    List<WorkItem> findByWorkIdAndUserId(Long workId, Long userId);
+
 }
