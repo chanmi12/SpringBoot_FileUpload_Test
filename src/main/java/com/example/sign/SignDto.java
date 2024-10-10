@@ -16,12 +16,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class SignDto {
     private Long id;
-    private UserDto user;
+    private Long userId;
     private String path;
     private boolean saved;
     private boolean deleted;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
-
 
 }

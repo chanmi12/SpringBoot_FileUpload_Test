@@ -44,7 +44,6 @@ public class Work {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updateDate;
-
     private LocalDateTime deleteDate;
     private LocalDateTime openDate;
 
@@ -64,6 +63,5 @@ public class Work {
     @PreUpdate
     protected void onUpdate() {
         this.updateDate = LocalDateTime.now();
-
     }
 }

@@ -8,13 +8,14 @@ public class SignMapper {
 
     public SignDto toDto(Sign sign) {
         SignDto signDto = new SignDto();
-        sign.setId(sign.getId());
         signDto.setId(sign.getId());
+        signDto.setUserId(sign.getUser().getId());
         signDto.setPath(sign.getPath());
         signDto.setSaved(sign.isSaved());
         signDto.setDeleted(sign.isDeleted());
         signDto.setCreateDate(sign.getCreateDate());
         signDto.setUpdateDate(sign.getUpdateDate());
+
 
         return signDto;
     }

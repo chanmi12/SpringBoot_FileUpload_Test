@@ -1,8 +1,11 @@
 package com.example.sign;
 
+import com.example.user.User;
+import com.example.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,8 +19,10 @@ public class SignController {
 
     @Autowired
     private  SignService signService;
+    @Autowired
+    private UserService userService;
 
-    // Create a new sign
+
     @PostMapping("/create")
     public ResponseEntity<SignDto> createSign(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
         SignDto signDto = signService.createSign(userId, file);
@@ -25,12 +30,30 @@ public class SignController {
     }
 
     // Update an existing sign
-    @PutMapping("/update/{signId}")
-    public ResponseEntity<SignDto> updateSign(
+//    @PutMapping("/update/{signId}")
+//    public ResponseEntity<SignDto> updateSign(
+//            @PathVariable Long userId,
+//            @PathVariable Long signId,
+//            @RequestParam("file") MultipartFile file) {
+//        SignDto updatedSign = signService.updateSign(userId, signId, file);
+//        return ResponseEntity.ok(updatedSign);
+//    }
+    @PutMapping("/updateFile/{signId}")
+    public ResponseEntity<String> updateSignFile(
             @PathVariable Long userId,
             @PathVariable Long signId,
             @RequestParam("file") MultipartFile file) {
-        SignDto updatedSign = signService.updateSign(userId, signId, file);
+        String newFileUrl = signService.updateSignFile(signId, userId, file);
+        return ResponseEntity.ok("File updated successfully: " + newFileUrl);
+    }
+
+    // Update specific fields of a sign (like path, saved, deleted)
+    @PutMapping("/update/{signId}")
+    public ResponseEntity<SignDto> updateSignFields(
+            @PathVariable Long userId,
+            @PathVariable Long signId,
+            @RequestBody SignDto signDto) {
+        SignDto updatedSign = signService.updateSignFields(signId, userId, signDto);
         return ResponseEntity.ok(updatedSign);
     }
 
