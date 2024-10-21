@@ -30,8 +30,8 @@ public class WorkItemService {
     private WorkItemMapper workItemMapper;
     @Autowired
     private UserService userService;
-    @Autowired
-    private WorkService workService;
+//    @Autowired
+//    private WorkService workService;
 
 
     @Transactional
@@ -49,14 +49,14 @@ public class WorkItemService {
         workItem.setUser(user); // Assign the non-null User
         workItem.setSignId(0L);
 
+
         // Ensure the 'type' field is set to a non-null value
         workItem.setType(1); // Set this to a default type, or derive it from your business logic.
 
         // Save the WorkItem to the repository
         workItemRepository.save(workItem);
         // 작업 공유 상태 업데이트
-        workService.updateWorkSharedStatus(workId, user.getId());
-
+//        workService.updateWorkSharedStatus(workId, user.getId());
         // Return the WorkItemDto
         return workItemMapper.toDto(workItem);
     }
@@ -72,7 +72,7 @@ public class WorkItemService {
 
         WorkItem savedWorkItem = workItemRepository.save(workItem);
         // 작업 공유 상태 업데이트
-        workService.updateWorkSharedStatus(workId, userId);
+//        workService.updateWorkSharedStatus(workId, userId);
 
         // Save the workItem
         return savedWorkItem;
@@ -125,7 +125,7 @@ public class WorkItemService {
         //Save the updated WorkItem
        WorkItem updatedWorkItem = workItemRepository.save(workItem);
         // 작업 공유 상태 업데이트
-       workService.updateWorkSharedStatus(workItem.getWork().getId(), workItem.getUser().getId());
+//       workService.updateWorkSharedStatus(workItem.getWork().getId(), workItem.getUser().getId());
        //Return the updated WorkItemDto
         return workItemMapper.toDto(updatedWorkItem);
     }
@@ -148,7 +148,7 @@ public void deleteWorkItem(Long workItemId) {
     workItemRepository.delete(workItem);
 
     // 작업 공유 상태 업데이트
-    workService.updateWorkSharedStatus(workItem.getWork().getId(), workItem.getUser().getId());
+//    workService.updateWorkSharedStatus(workItem.getWork().getId(), workItem.getUser().getId());
 }
 
     public List<WorkItem> getWorkItemsByWorkIdAndOtherUserId(Long workId, Long otherId) {//특정 작업에 대한 특정 사용자의 모든 작업 항목 가져오기
@@ -165,7 +165,7 @@ public void deleteWorkItem(Long workItemId) {
         workItemRepository.deleteAll(workItems);
 
         // 작업 공유 상태 업데이트
-        workService.updateWorkSharedStatus(workId, userId);
+//        workService.updateWorkSharedStatus(workId, userId);
     }
 
 }
