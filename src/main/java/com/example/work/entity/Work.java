@@ -1,6 +1,5 @@
 package com.example.work.entity;
 
-import com.example.userWorkItem.UserWorkItem;
 import com.example.workItem.WorkItem;
 import jakarta.persistence.*;
 import lombok.Getter;

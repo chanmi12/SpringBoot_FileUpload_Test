@@ -92,7 +92,41 @@ public class WorkController{
         return ResponseEntity.ok(works);
     }
 
+    //휴지통
+    @PutMapping("/{userId}/works/{workId}/trashedOn") //작업을 휴지통으로 이동
+    public ResponseEntity<String> markOnWokrTrashed(@PathVariable Long userId, @PathVariable Long workId){
+        workService.markOnWorkTrashed(userId, workId);
+        return ResponseEntity.ok("Work ID " + workId + " moved to trashed.");
+    }
+    @PutMapping("/{userId}/works/{workId}/trashedOff") //작업을 휴지통에서 복원
+    public ResponseEntity<String> markOffWorkTrashed(@PathVariable Long userId, @PathVariable Long workId) {
+        workService.markOffWorkTrashed(userId, workId);
+        return ResponseEntity.ok("Work ID " + workId + " restored from trashed.");
+    }
 
+    @GetMapping("/{userId}/works/trashed") //휴지통 조회
+    public ResponseEntity<List<WorkDto>> getTrashedWork(@PathVariable Long userId){
+        List<WorkDto> trashedWorks = workService.getTrashedWorksByUserId(userId);
+        return ResponseEntity.ok(trashedWorks);
+    }
+
+    @GetMapping("/{userId}/works/NotTrashed") //휴지통이 아닌 작업 조회
+    public ResponseEntity<List<WorkDto>> getNotTrashedWork(@PathVariable Long userId){
+        List<WorkDto> trashedWorks = workService.getNotTrashedWorksByUserId(userId);
+        return ResponseEntity.ok(trashedWorks);
+    }
+// 공유
+@PostMapping("/{workId}/updateSharedStatus") //공유 상태 변경
+    public ResponseEntity<Void> updateSharedStatus(@PathVariable Long userId, @PathVariable Long workId) {
+        workService.updateWorkSharedStatus(workId, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{userId}/works/shared")
+    public ResponseEntity<List<WorkDto>> getSharedWorks(@PathVariable Long userId) {
+        List<WorkDto> sharedWorks = workService.getSharedWorksByUserId(userId);
+        return ResponseEntity.ok(sharedWorks);
+    }
 }
 /* 이전 버전
 @RestController

@@ -5,6 +5,8 @@ import com.example.work.WorkDto;
 import com.example.work.WorkMapper;
 import com.example.work.entity.Work;
 import com.example.work.repository.WorkRepository;
+import com.example.workItem.WorkItem;
+import com.example.workItem.WorkItemRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,13 +26,14 @@ public class WorkService {
     private AwsS3Service awsS3Service;
     @Autowired
     private WorkMapper workMapper;
-
+    @Autowired
+    WorkItemRepository workItemRepository;
     //Work 업로드
-public String uploadWork(Long userId, MultipartFile file, String name) {
-    if(file.isEmpty()){
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty");
-    }
-    //파일 업로드
+    public String uploadWork(Long userId, MultipartFile file, String name) {
+        if (file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty");
+        }
+        //파일 업로드
         String fileUrl = awsS3Service.uploadFile("file", file);
         Work work = new Work();
         work.setUserId(userId);
@@ -39,19 +42,22 @@ public String uploadWork(Long userId, MultipartFile file, String name) {
         workRepository.save(work);
 
         return "File uploaded successfully. Work ID: " + work.getId();
-}
+    }
+
     //유저의 Work 목록 조회
-    public List<WorkDto> getUserWorks(Long userId){
+    public List<WorkDto> getUserWorks(Long userId) {
         List<Work> works = workRepository.findByUserId(userId);
         return works.stream()
                 .map(workMapper::toDto)
                 .collect(Collectors.toList());
     }
+
     //유저의 Work 조회
-    public WorkDto getWorkByIdAndUserId(Long userId, Long workId){
+    public WorkDto getWorkByIdAndUserId(Long userId, Long workId) {
         Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
         return workOpt.map(workMapper::toDto).orElse(null);
     }
+
     //Work 파일 업데이트
     public String updateWorkFile(Long workId, Long userId, MultipartFile file) {
         Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
@@ -148,5 +154,70 @@ public String uploadWork(Long userId, MultipartFile file, String name) {
         return workMapper.toDto(existingWork);
     }
 
+    //휴지통
+    @Transactional
+    public void markOnWorkTrashed(Long userId, Long workId) { // 휴지통으로 이동
+        Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
+        if (!workOpt.isPresent()) {
+            throw new IllegalArgumentException("Work not found for given id and user" + workId);
+        }
+        Work work = workOpt.get();
+        work.setTrashed(true);
+        workRepository.save(work);
+    }
 
+    @Transactional
+    public void markOffWorkTrashed(Long userId, Long workId) { // 휴지통에서 복구
+        Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
+        if (!workOpt.isPresent()) {
+            throw new IllegalArgumentException("Work not found for given id and user" + workId);
+        }
+        Work work = workOpt.get();
+        work.setTrashed(false);
+        workRepository.save(work);
+    }
+
+    @Transactional
+    public List<WorkDto> getTrashedWorksByUserId(Long userId) { // 휴지통 조회
+        List<Work> trashedWorks = workRepository.findByUserIdAndTrashedTrue(userId);
+        return trashedWorks.stream()
+                .map(workMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<WorkDto> getNotTrashedWorksByUserId(Long userId) { // 휴지통이 아닌 파일 조회
+        List<Work> notTrashedWorks = workRepository.findByUserIdAndTrashedFalse(userId);
+        return notTrashedWorks.stream()
+                .map(workMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    //공유
+    //Work 공유 상태 변경
+    @Transactional
+    public void updateWorkSharedStatus(Long workId, Long userId){
+        Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
+        if(!workOpt.isPresent()){
+            throw new IllegalArgumentException("Work not found for given id and user");
+        }
+    Work work = workOpt.get();
+
+        //특정 Work에 대한 모든 User ID를 반환하는 쿼리
+        List <Long> distinctUserIds = workItemRepository.findDistinctUserIdsByWorkId(workId);
+        if(distinctUserIds.size()>1){ //공유된 Work
+            work.setShared(true);
+        }else{//공유되지 않은 Work
+            work.setShared(false);
+        }
+        workRepository.save(work);
+    }
+    //공유된 Work 조회
+    @Transactional
+    public List<WorkDto> getSharedWorksByUserId(Long userId){
+        List<Work> sharedWorks = workRepository.findByUserIdAndSharedTrue(userId);
+        return sharedWorks.stream()
+                .map(workMapper::toDto)
+                .collect(Collectors.toList());
+    }
 }

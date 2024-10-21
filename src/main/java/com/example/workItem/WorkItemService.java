@@ -5,6 +5,7 @@ import com.example.user.UserRepository;
 import com.example.user.UserService;
 import com.example.work.repository.WorkRepository;
 
+import com.example.work.service.WorkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,8 @@ public class WorkItemService {
     private WorkItemMapper workItemMapper;
     @Autowired
     private UserService userService;
+    @Autowired
+    private WorkService workService;
 
 
     @Transactional
@@ -51,6 +54,8 @@ public class WorkItemService {
 
         // Save the WorkItem to the repository
         workItemRepository.save(workItem);
+        // 작업 공유 상태 업데이트
+        workService.updateWorkSharedStatus(workId, user.getId());
 
         // Return the WorkItemDto
         return workItemMapper.toDto(workItem);
@@ -65,8 +70,12 @@ public class WorkItemService {
         // Call toEntity with the required parameters
         WorkItem workItem = workItemMapper.toEntity(workItemDto, work, user);
 
+        WorkItem savedWorkItem = workItemRepository.save(workItem);
+        // 작업 공유 상태 업데이트
+        workService.updateWorkSharedStatus(workId, userId);
+
         // Save the workItem
-        return workItemRepository.save(workItem);
+        return savedWorkItem;
     }
 
 
@@ -114,17 +123,33 @@ public class WorkItemService {
         workItem.setFontSize(workItemDto.getFontSize());
         workItem.setFontStyle(workItemDto.getFontStyle());
         //Save the updated WorkItem
-        workItemRepository.save(workItem);
-        //Return the updated WorkItemDto
-        return workItemMapper.toDto(workItem);
+       WorkItem updatedWorkItem = workItemRepository.save(workItem);
+        // 작업 공유 상태 업데이트
+       workService.updateWorkSharedStatus(workItem.getWork().getId(), workItem.getUser().getId());
+       //Return the updated WorkItemDto
+        return workItemMapper.toDto(updatedWorkItem);
     }
-    public void deleteWorkItem(Long workItemId){  //ID로 작업 항목 삭제
 
-         if (!workItemRepository.existsById(workItemId)){
-            throw new IllegalArgumentException("WorkItem not found");
-        }
-         workItemRepository.deleteById(workItemId);
-    }
+    //이전 삭제 버전
+//    public void deleteWorkItem(Long workItemId){  //ID로 작업 항목 삭제
+//
+//         if (!workItemRepository.existsById(workItemId)){
+//            throw new IllegalArgumentException("WorkItem not found");
+//        }
+//         workItemRepository.deleteById(workItemId);
+//
+//    }
+
+@Transactional
+public void deleteWorkItem(Long workItemId) {
+    WorkItem workItem = workItemRepository.findById(workItemId)
+            .orElseThrow(() -> new IllegalArgumentException("WorkItem not found"));
+
+    workItemRepository.delete(workItem);
+
+    // 작업 공유 상태 업데이트
+    workService.updateWorkSharedStatus(workItem.getWork().getId(), workItem.getUser().getId());
+}
 
     public List<WorkItem> getWorkItemsByWorkIdAndOtherUserId(Long workId, Long otherId) {//특정 작업에 대한 특정 사용자의 모든 작업 항목 가져오기
         return workItemRepository.findByWorkIdAndOtherUserId(workId, otherId);
@@ -137,7 +162,10 @@ public class WorkItemService {
         if (workItems.isEmpty()) {
             throw new IllegalArgumentException("No WorkItems found for the user in this work.");
         }
-
         workItemRepository.deleteAll(workItems);
+
+        // 작업 공유 상태 업데이트
+        workService.updateWorkSharedStatus(workId, userId);
     }
+
 }
