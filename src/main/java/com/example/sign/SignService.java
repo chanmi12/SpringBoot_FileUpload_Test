@@ -144,4 +144,41 @@ public class SignService {
         sign.setUpdateDate(LocalDateTime.now());
         signRepository.save(sign);
     }
+
+
+    //휴지통 이동
+    @Transactional
+    public SignDto  moveToTrash(Long signId){
+        Sign sign = signRepository.findById(signId)
+                .orElseThrow(() -> new IllegalArgumentException("Sign not found for given id"));
+        sign.setDeleted(true);
+
+        Sign updatedSign = signRepository.save(sign);
+        return signMapper.toDto(updatedSign);
+    }
+
+    //휴지통에서 복구
+    @Transactional
+    public SignDto restoreFromTrash(Long signId){
+        Sign sign = signRepository.findById(signId)
+                .orElseThrow(() -> new IllegalArgumentException("Sign not found for given id" + signId));
+
+        sign.setDeleted(false);
+        Sign updatedSign = signRepository.save(sign);
+        return signMapper.toDto(updatedSign);
+    }
+    //휴지통에 있는 sign 가져오기
+    public List<SignDto> getDeletedSignsForUser(Long userId){
+        List<Sign> deletedSigns = signRepository.findByUserIdAndDeletedTrue(userId);
+        return deletedSigns.stream()
+                .map(signMapper::toDto)
+                .collect(Collectors.toList());
+    }
+    //delete되지 않은 sign 가져오기
+    public List<SignDto> getNonDeletedSignsForUser(Long userId){
+        List<Sign> nonDeletedSign = signRepository.findByUserIdAndDeletedFalse(userId);
+        return nonDeletedSign.stream()
+                .map(signMapper::toDto)
+                .collect(Collectors.toList());
+    }
 }

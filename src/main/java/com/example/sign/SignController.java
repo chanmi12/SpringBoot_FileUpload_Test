@@ -77,4 +77,34 @@ public class SignController {
         signService.deleteSign(userId, signId);
         return ResponseEntity.ok("Sign successfully deleted.");
     }
+
+    //휴지통
+    @PutMapping("/trash/{signId}")
+    public ResponseEntity<SignDto> moveToThrash(
+                                    @PathVariable Long userId,
+                                    @PathVariable Long signId) {
+        SignDto signDto = signService.moveToTrash(signId);
+        return ResponseEntity.ok(signDto);
+    }
+
+    //복원
+    @PutMapping("/restore/{signId}")
+    public ResponseEntity<SignDto> restoreSign(
+                                    @PathVariable Long userId,
+                                    @PathVariable Long signId) {
+        SignDto signDto = signService.restoreFromTrash(signId);
+        return ResponseEntity.ok(signDto);
+    }
+    //휴지통에 있는 sign들 조회
+    @GetMapping("/deleted")
+    public ResponseEntity<List<SignDto>> getDeletedSignsForUser(@PathVariable Long userId) {
+        List<SignDto> deletedSigns = signService.getDeletedSignsForUser(userId);
+        return ResponseEntity.ok(deletedSigns);
+    }
+    //delete되지 않은 sign들 조회
+    @GetMapping("/notDeleted")
+    public ResponseEntity<List<SignDto>> getNonDeletedSignsForUser(@PathVariable Long userId) {
+        List<SignDto> notDeletedSigns = signService.getNonDeletedSignsForUser(userId);
+        return ResponseEntity.ok(notDeletedSigns);
+    }
 }
