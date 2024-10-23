@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -163,6 +164,7 @@ public class WorkService {
         }
         Work work = workOpt.get();
         work.setTrashed(true);
+        work.setDeleteDate(LocalDateTime.now());
         workRepository.save(work);
     }
 
