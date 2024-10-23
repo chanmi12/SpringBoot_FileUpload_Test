@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class WorkItemDto {
     private Long id;
     private Long workId;
-    private Long signId;
+    private Long signId;//This is fine in the DTO, but not in the entity
     private Long userId;
     private Integer type;
     private String text;

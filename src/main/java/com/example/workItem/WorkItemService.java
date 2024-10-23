@@ -1,5 +1,7 @@
 package com.example.workItem;
 
+import com.example.sign.Sign;
+import com.example.sign.SignRepository;
 import com.example.user.UserDto;
 import com.example.user.UserRepository;
 import com.example.user.UserService;
@@ -30,12 +32,12 @@ public class WorkItemService {
     private WorkItemMapper workItemMapper;
     @Autowired
     private UserService userService;
-//    @Autowired
-//    private WorkService workService;
+    @Autowired
+    private SignRepository signRepository;
 
 
     @Transactional
-    public WorkItemDto inviteUserToWork(Long workId, UserDto userDto) {
+    public WorkItemDto inviteUserToWork(Long workId, UserDto userDto, Long signId) {
         // Step 1: Find the work entity by ID
         Work work = workRepository.findById(workId)
                 .orElseThrow(() -> new IllegalArgumentException("Work not found"));
@@ -47,12 +49,18 @@ public class WorkItemService {
         WorkItem workItem = new WorkItem();
         workItem.setWork(work);
         workItem.setUser(user); // Assign the non-null User
-        workItem.setSignId(0L);
+        workItem.setType(1); //Default type
 
 
         // Ensure the 'type' field is set to a non-null value
         workItem.setType(1); // Set this to a default type, or derive it from your business logic.
 
+        // Set the sign if it is not null
+        if(signId != null && signId > 0) {
+            Sign sign = signRepository.findById(signId)
+                    .orElseThrow(() -> new IllegalArgumentException("Sign not found"));
+            workItem.setSign(sign);
+        }
         // Save the WorkItem to the repository
         workItemRepository.save(workItem);
         // 작업 공유 상태 업데이트
@@ -60,22 +68,32 @@ public class WorkItemService {
         // Return the WorkItemDto
         return workItemMapper.toDto(workItem);
     }
-    public WorkItem createWorkItem(WorkItemDto workItemDto, Long workId, Long userId) {
-        // Retrieve Work and User from their respective services or repositories
+    @Transactional
+    public WorkItem createWorkItem(WorkItemDto workItemDto, Long workId, Long userId, Long signId) {
+        // Find the work entity by ID
         Work work = workRepository.findById(workId)
-                .orElseThrow(() -> new RuntimeException("Work not found with id: " + workId));
+                .orElseThrow(() -> new IllegalArgumentException("Work not found with id: " + workId));
+
+        // Find the user entity by ID
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
 
-        // Call toEntity with the required parameters
-        WorkItem workItem = workItemMapper.toEntity(workItemDto, work, user);
+        // Create a new WorkItem entity
+        WorkItem workItem = new WorkItem();
+        workItem.setWork(work);
+        workItem.setUser(user);
 
-        WorkItem savedWorkItem = workItemRepository.save(workItem);
-        // 작업 공유 상태 업데이트
-//        workService.updateWorkSharedStatus(workId, userId);
+        // If signId is provided and valid, associate the sign with the WorkItem
+        if (signId != null && signId > 0) {
+            Sign sign = signRepository.findById(signId)
+                    .orElseThrow(() -> new IllegalArgumentException("Sign not found with id: " + signId));
+            workItem.setSign(sign);
+        } else {
+            workItem.setSign(null); // or handle default logic
+        }
 
-        // Save the workItem
-        return savedWorkItem;
+        // Save the WorkItem to the repository
+        return workItemRepository.save(workItem);
     }
 
 
@@ -89,15 +107,13 @@ public class WorkItemService {
 
     public WorkItem createDefaultWorkItemForCreator(Work work, User creator) { //작업 생성자를 위한 기본 작업 항목 생성
         WorkItem workItem = new WorkItem(work, creator);
-        // workItem.setSignId(0L);
-        workItem.setType(2);
+        workItem.setType(1);
         return workItemRepository.save(workItem);
     }
 
     public List<UserDto> listUniqueUsersForWork(Long workId) {
         // Find all WorkItems for the specified workId
         List<WorkItem> workItems = workItemRepository.findByWorkId(workId);
-
         // Map the WorkItem list to users, ensure no duplicates
         return workItems.stream()
                 .map(WorkItem::getUser) // Extract user from each WorkItem
@@ -107,11 +123,17 @@ public class WorkItemService {
     }
 
     public WorkItemDto updateWorkItem(Long workItemId, WorkItemDto workItemDto){ //ID로 작업 항목 업데이트
-        //Find the WorkItem by ID
+        //WorkItem 엔티티를 찾아서 가져온다.
         WorkItem workItem = workItemRepository.findById(workItemId)
                 .orElseThrow(() -> new IllegalArgumentException("WorkItem not found"));
-        //Update the WorkItem with the new values
-        workItem.setSignId(workItemDto.getSignId());
+        //Sign이 존재하면 Sign을 가져와서 WorkItem에 설정한다.
+        if (workItemDto.getSignId()!= null && workItemDto.getSignId()>0){
+            Sign sign = signRepository.findById(workItemDto.getSignId()).orElseThrow(()-> new IllegalArgumentException("Sign not found with id : "+ workItemDto.getSignId()));
+            workItem.setSign(sign);
+        }else{//Sign이 없으면 null로 설정
+            workItem.setSign(null);
+        }
+        //WorkItemDto의 필드를 업데이트한다.
         workItem.setType(workItemDto.getType());
         workItem.setText(workItemDto.getText());
         workItem.setXPosition(workItemDto.getXPosition());
@@ -124,31 +146,16 @@ public class WorkItemService {
         workItem.setFontStyle(workItemDto.getFontStyle());
         //Save the updated WorkItem
        WorkItem updatedWorkItem = workItemRepository.save(workItem);
-        // 작업 공유 상태 업데이트
-//       workService.updateWorkSharedStatus(workItem.getWork().getId(), workItem.getUser().getId());
-       //Return the updated WorkItemDto
+
         return workItemMapper.toDto(updatedWorkItem);
     }
 
-    //이전 삭제 버전
-//    public void deleteWorkItem(Long workItemId){  //ID로 작업 항목 삭제
-//
-//         if (!workItemRepository.existsById(workItemId)){
-//            throw new IllegalArgumentException("WorkItem not found");
-//        }
-//         workItemRepository.deleteById(workItemId);
-//
-//    }
 
 @Transactional
 public void deleteWorkItem(Long workItemId) {
     WorkItem workItem = workItemRepository.findById(workItemId)
             .orElseThrow(() -> new IllegalArgumentException("WorkItem not found"));
-
     workItemRepository.delete(workItem);
-
-    // 작업 공유 상태 업데이트
-//    workService.updateWorkSharedStatus(workItem.getWork().getId(), workItem.getUser().getId());
 }
 
     public List<WorkItem> getWorkItemsByWorkIdAndOtherUserId(Long workId, Long otherId) {//특정 작업에 대한 특정 사용자의 모든 작업 항목 가져오기
@@ -164,8 +171,6 @@ public void deleteWorkItem(Long workItemId) {
         }
         workItemRepository.deleteAll(workItems);
 
-        // 작업 공유 상태 업데이트
-//        workService.updateWorkSharedStatus(workId, userId);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.workItem;
 
+import com.example.sign.Sign;
 import com.example.userWorkItem.UserWorkItem;
 import com.example.work.entity.Work;
 import com.example.user.User;
@@ -36,8 +37,9 @@ public class WorkItem {
     @OneToMany(mappedBy = "workItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserWorkItem> userWorkItems; // List of UserWorkItems
 
-    @Column(name = "sign_id", nullable = true)
-    private Long signId = 0L;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sign_id", nullable = true)  // Nullable to handle cases where no sign is set
+    private Sign sign;  // Reference to the Sign entity
 
     @Column(name = "type", nullable = true)
     private Integer type;
@@ -84,7 +86,7 @@ public class WorkItem {
         WorkItem workItem = new WorkItem();
         workItem.setWork(work);
         workItem.setUser(user);
-        workItem.setSignId(workItemDto.getSignId());
+        workItem.setSign(null); // Set sign to null initially
         workItem.setType(workItemDto.getType() != null ? workItemDto.getType() : 1); // Provide default type if null
         // Set other fields
 

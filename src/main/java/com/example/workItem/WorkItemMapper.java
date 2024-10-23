@@ -1,6 +1,7 @@
 package com.example.workItem;
 
 
+import com.example.sign.Sign;
 import com.example.user.User;
 import com.example.work.entity.Work;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ public class WorkItemMapper {
         dto.setId(workItem.getId());
         dto.setWorkId(workItem.getWork().getId());
         dto.setUserId(workItem.getUser().getId());
-        dto.setSignId(workItem.getSignId());
+        dto.setSignId(workItem.getSign() != null ? workItem.getSign().getId() : null);
         dto.setType(workItem.getType());
         dto.setText(workItem.getText());
         dto.setXPosition(workItem.getXPosition());
@@ -26,15 +27,21 @@ public class WorkItemMapper {
         dto.setPage(workItem.getPage());
         dto.setFontSize(workItem.getFontSize());
         dto.setFontStyle(workItem.getFontStyle());
+
         return dto;
     }
 
-    public static WorkItem toEntity(WorkItemDto dto, Work work, User user) {
+    public static WorkItem toEntity(WorkItemDto dto, Work work, User user, Sign sign) {
         WorkItem workItem = new WorkItem();
         workItem.setId(dto.getId());
         workItem.setWork(work);
         workItem.setUser(user);
-        workItem.setSignId(dto.getSignId());
+
+        if(sign!= null){
+            workItem.setSign(sign);
+        }else{
+            workItem.setSign(null);
+        }
         workItem.setType(dto.getType());
         workItem.setText(dto.getText());
         workItem.setXPosition(dto.getXPosition());
@@ -45,6 +52,9 @@ public class WorkItemMapper {
         workItem.setPage(dto.getPage());
         workItem.setFontSize(dto.getFontSize());
         workItem.setFontStyle(dto.getFontStyle());
+
+
+
         return workItem;
     }
 

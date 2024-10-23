@@ -1,5 +1,7 @@
 package com.example.workItem;
 
+import com.example.sign.Sign;
+import com.example.sign.SignService;
 import com.example.user.UserDto;
 import com.example.user.UserService;
 import com.example.work.service.WorkService;
@@ -22,19 +24,27 @@ public class WorkItemController {
     private UserService userService;
     @Autowired
     private WorkService workService;
+    @Autowired
+    private SignService signService;
 
     //workId에 해당하는 work에 userDto를 초대
-    @PostMapping("/{userId}/{workId}/workItem/invite")
-    public ResponseEntity<WorkItemDto> inviteUserToWork(@PathVariable Long workId, @RequestBody UserDto userDto) {
-        WorkItemDto workItemDto = workItemService.inviteUserToWork(workId, userDto);
+    @PostMapping("/{userId}/{workId}/workItem//invite")
+    public ResponseEntity<WorkItemDto> inviteUserToWork(@PathVariable Long userId,
+                                                        @PathVariable Long workId,
+                                                        @RequestBody UserDto userDto,
+                                                        @RequestParam(required = false) Long signId) {
+        WorkItemDto workItemDto = workItemService.inviteUserToWork(workId, userDto,signId);
         return ResponseEntity.ok(workItemDto);
     }
 
     //workId에 해당하는 work에 속한 workItem 생성
     @PostMapping("/{userId}/{workId}/workItem")
-    public ResponseEntity<WorkItem> createWorkItem(@PathVariable Long userId, @PathVariable Long workId, @RequestBody WorkItemDto workItemDto) {
-        WorkItem workItem = workItemService.createWorkItem(workItemDto, workId, userId);
-        return ResponseEntity.ok(workItem);
+    public ResponseEntity<WorkItem> createWorkItem(@PathVariable Long userId,
+                                                   @RequestParam Long workId,
+                                                   @RequestBody WorkItemDto workItemDto,
+                                                    @RequestParam(required = false) Long signId) {
+        WorkItem createWorkItem = workItemService.createWorkItem(workItemDto, workId, userId, signId);
+        return ResponseEntity.ok(createWorkItem);
     }
 
     // 특정 Work의 모든 WorkItem 조회
@@ -75,4 +85,7 @@ public class WorkItemController {
         workItemService.deleteWorkItemsByUserAndWork(userId, workId);
         return ResponseEntity.ok("Work items deleted for the user in this work");
     }
+
+
+
 }
