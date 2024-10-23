@@ -96,13 +96,13 @@ public class SignController {
         return ResponseEntity.ok(signDto);
     }
     //휴지통에 있는 sign들 조회
-    @GetMapping("/deleted")
+    @GetMapping("/trash")
     public ResponseEntity<List<SignDto>> getDeletedSignsForUser(@PathVariable Long userId) {
         List<SignDto> deletedSigns = signService.getDeletedSignsForUser(userId);
         return ResponseEntity.ok(deletedSigns);
     }
     //delete되지 않은 sign들 조회
-    @GetMapping("/notDeleted")
+    @GetMapping("/notTrash")
     public ResponseEntity<List<SignDto>> getNonDeletedSignsForUser(@PathVariable Long userId) {
         List<SignDto> notDeletedSigns = signService.getNonDeletedSignsForUser(userId);
         return ResponseEntity.ok(notDeletedSigns);
