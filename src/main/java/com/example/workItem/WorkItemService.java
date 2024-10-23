@@ -173,4 +173,12 @@ public void deleteWorkItem(Long workItemId) {
 
     }
 
+//    @Transactional
+//    public WorkItemDto getWorkItemById(Long workItemId) {
+//        WorkItem workItem = workItemRepository.findById(workItemId)
+//                .orElseThrow(() -> new IllegalArgumentException("WorkItem not found with id: " + workItemId));
+//        return workItemMapper.toDto(workItem);
+//    }
+
+
 }

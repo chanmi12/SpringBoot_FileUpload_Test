@@ -1,5 +1,6 @@
 package com.example.workItem;
 
+import com.example.sign.SignDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,4 +29,5 @@ public class WorkItemDto {
     private Integer page;
     private Integer fontSize;
     private String fontStyle;
+    private SignDto sign; //This is fine in the DTO, but not in the entity
 }

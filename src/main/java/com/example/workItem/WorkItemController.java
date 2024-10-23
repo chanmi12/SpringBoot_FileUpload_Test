@@ -86,6 +86,10 @@ public class WorkItemController {
         return ResponseEntity.ok("Work items deleted for the user in this work");
     }
 
-
+//    @GetMapping("/{userId}/{workId}/workItem/{workItemId}")
+//    public ResponseEntity<WorkItemDto> getWorkItem(@PathVariable Long workId, @PathVariable Long workItemId) {
+//        WorkItemDto workItemDto = workItemService.getWorkItemById(workItemId);
+//        return ResponseEntity.ok(workItemDto);
+//    }
 
 }

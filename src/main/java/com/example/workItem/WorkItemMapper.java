@@ -2,6 +2,7 @@ package com.example.workItem;
 
 
 import com.example.sign.Sign;
+import com.example.sign.SignDto;
 import com.example.user.User;
 import com.example.work.entity.Work;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ public class WorkItemMapper {
         dto.setId(workItem.getId());
         dto.setWorkId(workItem.getWork().getId());
         dto.setUserId(workItem.getUser().getId());
-        dto.setSignId(workItem.getSign() != null ? workItem.getSign().getId() : null);
+
         dto.setType(workItem.getType());
         dto.setText(workItem.getText());
         dto.setXPosition(workItem.getXPosition());
@@ -27,6 +28,16 @@ public class WorkItemMapper {
         dto.setPage(workItem.getPage());
         dto.setFontSize(workItem.getFontSize());
         dto.setFontStyle(workItem.getFontStyle());
+
+        if (workItem.getSign() != null) {
+            SignDto signDto = new SignDto();
+            signDto.setId(workItem.getSign().getId());
+            // Add other fields as necessary from Sign to SignDto
+            dto.setSign(signDto);
+        }else{
+            dto.setSign(null);
+        }
+
 
         return dto;
     }
