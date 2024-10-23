@@ -28,7 +28,7 @@ public class WorkItemController {
     private SignService signService;
 
     //workId에 해당하는 work에 userDto를 초대
-    @PostMapping("/{userId}/{workId}/workItem//invite")
+    @PostMapping("/{userId}/{workId}/workItem/invite")
     public ResponseEntity<WorkItemDto> inviteUserToWork(@PathVariable Long userId,
                                                         @PathVariable Long workId,
                                                         @RequestBody UserDto userDto,
