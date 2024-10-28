@@ -1,6 +1,7 @@
 package com.example.workItem;
 
 import com.example.sign.Sign;
+import com.example.sign.SignMapper;
 import com.example.sign.SignRepository;
 import com.example.user.UserDto;
 import com.example.user.UserRepository;
@@ -34,6 +35,8 @@ public class WorkItemService {
     private UserService userService;
     @Autowired
     private SignRepository signRepository;
+    @Autowired
+    private SignMapper signMapper;
 
 
     @Transactional
@@ -97,11 +100,19 @@ public class WorkItemService {
     }
 
 
-    public List<WorkItemDto> findByWorkId(Long workId){ //특정 작업에 대한 모든 작업 항목 가져오기
-        // Step 1: Find all WorkItems by workId
+    public List<WorkItemDto> findByWorkId(Long workId) {
         List<WorkItem> workItems = workItemRepository.findByWorkId(workId);
+
         return workItems.stream()
-                .map(workItemMapper :: toDto)
+                .map(workItem -> {
+                    WorkItemDto dto = workItemMapper.toDto(workItem);
+                    if (workItem.getSign() == null) {
+                        dto.setSign(null); // signId가 null이면 sign을 null로 설정
+                    } else {
+                       dto.setSign(signMapper.toDto(workItem.getSign()));//signId가 존재하면 sign을 가져와서 설정
+                    }
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 

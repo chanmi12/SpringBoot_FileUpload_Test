@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -26,7 +27,8 @@ public class WorkItemController {
     private WorkService workService;
     @Autowired
     private SignService signService;
-
+@Autowired
+private WorkItemMapper workItemMapper;
     //workId에 해당하는 work에 userDto를 초대
     @PostMapping("/{userId}/{workId}/workItem/invite")
     public ResponseEntity<WorkItemDto> inviteUserToWork(@PathVariable Long userId,
@@ -54,9 +56,19 @@ public class WorkItemController {
         return ResponseEntity.ok(workItems);
     }
     @GetMapping("/{userId}/{workId}/workItem/{otherId}") //특정 Work에 속한 특정 User의 WorkItem 조회
-    public ResponseEntity<List<WorkItem>> getWorkItemsByWorkIdAndOtherUserId(@PathVariable Long workId, @PathVariable Long otherId) {
+//    public ResponseEntity<List<WorkItem>> getWorkItemsByWorkIdAndOtherUserId(@PathVariable Long workId, @PathVariable Long otherId) {
+//        List<WorkItem> workItems = workItemService.getWorkItemsByWorkIdAndOtherUserId(workId, otherId);
+//        return ResponseEntity.ok(workItems);
+//    }
+    public ResponseEntity<List<WorkItemDto>> getWorkItemByWorkIdAmdOtherUserId(@PathVariable Long workId, @PathVariable Long otherId) {
+        //특정 Work에 속한 특정 User의 WorkItem 조회
         List<WorkItem> workItems = workItemService.getWorkItemsByWorkIdAndOtherUserId(workId, otherId);
-        return ResponseEntity.ok(workItems);
+        //Stream API를 사용하여 Entity를 Dto로 변환
+        List<WorkItemDto> workItemDtos = workItems.stream()
+                .map(workItemMapper::toDto)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(workItemDtos);
     }
 
     @GetMapping("/{userId}/{workId}/workItem/users") //특정 Work에 속한 모든 User 조회

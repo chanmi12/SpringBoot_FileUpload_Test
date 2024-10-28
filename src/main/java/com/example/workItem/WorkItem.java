@@ -31,6 +31,7 @@ public class WorkItem {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     // New relationship with UserWorkItem

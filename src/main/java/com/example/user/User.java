@@ -2,6 +2,9 @@ package com.example.user;
 
 import com.example.sign.Sign;
 import com.example.userWorkItem.UserWorkItem;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,9 +38,11 @@ public class User {
     private Integer level;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<UserWorkItem> userWorkItems; // Link to UserWorkItem
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+   @JsonIgnore
     private List<Sign> signs; // User가 여러 개의 Sign을 가질 수 있음
     @PrePersist
     protected void onCreate() {

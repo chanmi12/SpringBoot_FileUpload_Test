@@ -1,6 +1,8 @@
 package com.example.sign;
 
 import com.example.user.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +23,7 @@ public class Sign {
 
      @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "user_id", nullable = false)
+     @JsonIgnore
      private User user;
 
      @Column(nullable = false)
