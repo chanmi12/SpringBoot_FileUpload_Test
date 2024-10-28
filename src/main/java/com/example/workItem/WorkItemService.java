@@ -6,18 +6,16 @@ import com.example.sign.SignRepository;
 import com.example.user.UserDto;
 import com.example.user.UserRepository;
 import com.example.user.UserService;
-import com.example.work.repository.WorkRepository;
+import com.example.work.WorkRepository;
 
-import com.example.work.service.WorkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.user.User;
-import com.example.work.entity.Work;
+import com.example.work.Work;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

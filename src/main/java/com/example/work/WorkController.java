@@ -1,7 +1,7 @@
-package com.example.work.controller;
+package com.example.work;
 
 import com.example.work.WorkDto;
-import com.example.work.service.WorkService;
+import com.example.work.WorkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

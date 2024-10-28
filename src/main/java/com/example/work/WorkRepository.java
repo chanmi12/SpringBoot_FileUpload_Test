@@ -1,6 +1,5 @@
-package com.example.work.repository;
+package com.example.work;
 
-import com.example.work.entity.Work;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

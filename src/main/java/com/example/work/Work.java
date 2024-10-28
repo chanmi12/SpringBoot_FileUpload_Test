@@ -1,4 +1,4 @@
-package com.example.work.entity;
+package com.example.work;
 
 import com.example.workItem.WorkItem;
 import jakarta.persistence.*;

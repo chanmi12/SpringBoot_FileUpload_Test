@@ -2,7 +2,7 @@ package com.example.workItem;
 
 import com.example.sign.Sign;
 import com.example.userWorkItem.UserWorkItem;
-import com.example.work.entity.Work;
+import com.example.work.Work;
 import com.example.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

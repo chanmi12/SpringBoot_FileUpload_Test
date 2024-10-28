@@ -1,11 +1,6 @@
-package com.example.work.service;
+package com.example.work;
 
 import com.example.awsS3.AwsS3Service;
-import com.example.work.WorkDto;
-import com.example.work.WorkMapper;
-import com.example.work.entity.Work;
-import com.example.work.repository.WorkRepository;
-import com.example.workItem.WorkItem;
 import com.example.workItem.WorkItemRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

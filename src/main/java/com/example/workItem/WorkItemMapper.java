@@ -4,7 +4,7 @@ package com.example.workItem;
 import com.example.sign.Sign;
 import com.example.sign.SignDto;
 import com.example.user.User;
-import com.example.work.entity.Work;
+import com.example.work.Work;
 import org.springframework.stereotype.Component;
 
 

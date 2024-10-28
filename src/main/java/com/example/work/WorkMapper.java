@@ -1,6 +1,5 @@
 package com.example.work;
 
-import com.example.work.entity.Work;
 import org.springframework.stereotype.Component;
 
 @Component

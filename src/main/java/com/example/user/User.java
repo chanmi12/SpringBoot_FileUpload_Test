@@ -1,15 +1,13 @@
 package com.example.user;
 
+import com.example.auth.dto.AuthDto;
 import com.example.sign.Sign;
 import com.example.userWorkItem.UserWorkItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +15,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
@@ -24,10 +23,28 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "unique_id", nullable = false, length = 50)
+    private String uniqueId;
+
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "email" )
     private String email;
+
+    @Column(name = "grade")
+    private Integer grade;
+
+    @Column(name = "semester")
+    private Integer semester;
+
+    @Column(name = "department", length = 50)
+    private String department;
+
+    @Column(name = "major1", length = 50)
+    private String major1;
+
+    @Column(name = "major2", length = 50)
+    private String major2;
 
     @Column(length = 255, nullable=false)
     private LocalDateTime createDate;
@@ -44,6 +61,30 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
    @JsonIgnore
     private List<Sign> signs; // User가 여러 개의 Sign을 가질 수 있음
+
+    public void update(AuthDto dto) {
+        this.name = dto.getName();
+        this.email = dto.getEmail();
+        this.grade = dto.getGrade();
+        this.semester = dto.getSemester();
+        this.department = dto.getDepartment();
+        this.major1 = dto.getMajor1();
+        this.major2 = dto.getMajor2();
+    }
+    public static User from(AuthDto dto) {
+        return User.builder()
+                .uniqueId(dto.getUniqueId())
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .grade(dto.getGrade())
+                .semester(dto.getSemester())
+                .department(dto.getDepartment())
+                .major1(dto.getMajor1())
+                .major2(dto.getMajor2())
+                .build();
+    }
+
+
     @PrePersist
     protected void onCreate() {
         this.createDate = LocalDateTime.now();

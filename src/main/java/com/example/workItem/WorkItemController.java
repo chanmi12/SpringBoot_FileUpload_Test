@@ -1,12 +1,10 @@
 package com.example.workItem;
 
-import com.example.sign.Sign;
 import com.example.sign.SignService;
 import com.example.user.UserDto;
 import com.example.user.UserService;
-import com.example.work.service.WorkService;
+import com.example.work.WorkService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
