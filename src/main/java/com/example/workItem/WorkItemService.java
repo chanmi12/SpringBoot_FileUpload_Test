@@ -1,6 +1,7 @@
 package com.example.workItem;
 
 import com.example.sign.Sign;
+import com.example.sign.SignDto;
 import com.example.sign.SignMapper;
 import com.example.sign.SignRepository;
 import com.example.user.UserDto;
@@ -158,22 +159,29 @@ public class WorkItemService {
     @Transactional
     public List<WorkItemDto> findByWorkId(Long workId) {
         List<WorkItem> workItems = workItemRepository.findByWorkId(workId);
+
         return workItems.stream()
                 .map(workItem -> {
                     WorkItemDto dto = workItemMapper.toDto(workItem);
-                    // signId만 설정하여 오류를 방지
-                    dto.setSignId(workItem.getSign() != null ? workItem.getSign().getId() : null);
-                    return dto;
 
+                    // signId가 null이 아니면 Sign 정보를 DTO에 추가
+                    if (workItem.getSign() != null) {
+                        SignDto signDto = signMapper.toDto(workItem.getSign());
+                        dto.setSign(signDto);
+                    } else {
+                        dto.setSign(null);
+                    }
+                    return dto;
                 })
                 .collect(Collectors.toList());
     }
-@Transactional
+    @Transactional
     public WorkItem createDefaultWorkItemForCreator(Work work, User creator) { //작업 생성자를 위한 기본 작업 항목 생성
         WorkItem workItem = new WorkItem(work, creator);
         workItem.setType(1);
         return workItemRepository.save(workItem);
     }
+
     @Transactional
     public List<UserDto> listUniqueUsersForWork(Long workId) {
         // Find all WorkItems for the specified workId

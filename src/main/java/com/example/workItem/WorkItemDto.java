@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class WorkItemDto {
     private Long id;
     private Long workId;
-    private Long signId; // Only retain this
+    private Long signId; // Stores the sign ID directly for easy retrieval
     private Long userId;
     private Integer type;
     private String text;
@@ -29,5 +29,7 @@ public class WorkItemDto {
     private Integer page;
     private Integer fontSize;
     private String fontStyle;
-    // Remove SignDto sign;
+    private SignDto sign; // Includes Sign details as a nested DTO
+
+    // Custom constructor or methods if needed for special cases
 }
