@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class WorkItemDto {
     private Long id;
     private Long workId;
-    private Long signId;//This is fine in the DTO, but not in the entity
+    private Long signId; // Only retain this
     private Long userId;
     private Integer type;
     private String text;
@@ -29,5 +29,5 @@ public class WorkItemDto {
     private Integer page;
     private Integer fontSize;
     private String fontStyle;
-    private SignDto sign; //This is fine in the DTO, but not in the entity
+    // Remove SignDto sign;
 }

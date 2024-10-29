@@ -28,11 +28,12 @@ public class WorkItemService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private SignRepository signRepository;
+
+    @Autowired
     private WorkItemMapper workItemMapper;
     @Autowired
     private UserService userService;
-    @Autowired
-    private SignRepository signRepository;
     @Autowired
     private SignMapper signMapper;
 
@@ -70,56 +71,110 @@ public class WorkItemService {
         return workItemMapper.toDto(workItem);
     }
     @Transactional
-    public WorkItem createWorkItem(WorkItemDto workItemDto, Long workId, Long userId, Long signId) {
-        // Find the work entity by ID
+    public WorkItem createWorkItem(WorkItemDto workItemDto, Long workId, Long userId, Long targetUserId, Long signId ) {
+        // Retrieve the Work entity
         Work work = workRepository.findById(workId)
                 .orElseThrow(() -> new IllegalArgumentException("Work not found with id: " + workId));
 
-        // Find the user entity by ID
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+        // Retrieve the User entity
+        User targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + targetUserId));
 
-        // Create a new WorkItem entity
+        // Create WorkItem
         WorkItem workItem = new WorkItem();
         workItem.setWork(work);
-        workItem.setUser(user);
+        workItem.setUser(targetUser);
 
-        // If signId is provided and valid, associate the sign with the WorkItem
-        if (signId != null && signId > 0) {
-            Sign sign = signRepository.findById(signId)
-                    .orElseThrow(() -> new IllegalArgumentException("Sign not found with id: " + signId));
-            workItem.setSign(sign);
-        } else {
-            workItem.setSign(null); // or handle default logic
+        // Assign fields based on type
+        switch (workItemDto.getType()) {
+            case 1: // General Signature
+                workItem.setType(1);
+                workItem.setXPosition(workItemDto.getXPosition());
+                workItem.setYPosition(workItemDto.getYPosition());
+                workItem.setWidth(workItemDto.getWidth());
+                workItem.setHeight(workItemDto.getHeight());
+                workItem.setFree(false);
+                workItem.setPage(workItemDto.getPage());
+
+                // Assign Sign if signId is provided
+                if (signId != null) {
+                    Sign sign = signRepository.findById(signId)
+                            .orElseThrow(() -> new IllegalArgumentException("Sign not found with id: " + signId));
+                    workItem.setSign(sign);
+                }
+                break;
+
+            case 2: // General Text
+                workItem.setType(2);
+                workItem.setText(workItemDto.getText());
+                workItem.setXPosition(workItemDto.getXPosition());
+                workItem.setYPosition(workItemDto.getYPosition());
+                workItem.setWidth(workItemDto.getWidth());
+                workItem.setHeight(workItemDto.getHeight());
+                workItem.setFree(false);
+                workItem.setPage(workItemDto.getPage());
+                workItem.setFontSize(workItemDto.getFontSize());
+                workItem.setFontStyle(workItemDto.getFontStyle());
+                break;
+
+            case 3: // Free Signature
+                workItem.setType(1);
+                workItem.setXPosition(workItemDto.getXPosition());
+                workItem.setYPosition(workItemDto.getYPosition());
+                workItem.setWidth(workItemDto.getWidth());
+                workItem.setHeight(workItemDto.getHeight());
+                workItem.setFree(true); // Free mode enabled
+                workItem.setPage(workItemDto.getPage());
+
+                // Assign Sign if signId is provided
+                if (signId != null) {
+                    Sign sign = signRepository.findById(signId)
+                            .orElseThrow(() -> new IllegalArgumentException("Sign not found with id: " + signId));
+                    workItem.setSign(sign);
+                }
+                break;
+
+            case 4: // Free Text
+                workItem.setType(2);
+                workItem.setText(workItemDto.getText());
+                workItem.setXPosition(workItemDto.getXPosition());
+                workItem.setYPosition(workItemDto.getYPosition());
+                workItem.setWidth(workItemDto.getWidth());
+                workItem.setHeight(workItemDto.getHeight());
+                workItem.setFree(true); // Free mode enabled
+                workItem.setPage(workItemDto.getPage());
+                workItem.setFontSize(workItemDto.getFontSize());
+                workItem.setFontStyle(workItemDto.getFontStyle());
+                break;
+
+            default:
+                throw new IllegalArgumentException("Invalid type value: " + workItemDto.getType());
         }
 
         // Save the WorkItem to the repository
         return workItemRepository.save(workItem);
     }
 
-
+    @Transactional
     public List<WorkItemDto> findByWorkId(Long workId) {
         List<WorkItem> workItems = workItemRepository.findByWorkId(workId);
-
         return workItems.stream()
                 .map(workItem -> {
                     WorkItemDto dto = workItemMapper.toDto(workItem);
-                    if (workItem.getSign() == null) {
-                        dto.setSign(null); // signId가 null이면 sign을 null로 설정
-                    } else {
-                       dto.setSign(signMapper.toDto(workItem.getSign()));//signId가 존재하면 sign을 가져와서 설정
-                    }
+                    // signId만 설정하여 오류를 방지
+                    dto.setSignId(workItem.getSign() != null ? workItem.getSign().getId() : null);
                     return dto;
+
                 })
                 .collect(Collectors.toList());
     }
-
+@Transactional
     public WorkItem createDefaultWorkItemForCreator(Work work, User creator) { //작업 생성자를 위한 기본 작업 항목 생성
         WorkItem workItem = new WorkItem(work, creator);
         workItem.setType(1);
         return workItemRepository.save(workItem);
     }
-
+    @Transactional
     public List<UserDto> listUniqueUsersForWork(Long workId) {
         // Find all WorkItems for the specified workId
         List<WorkItem> workItems = workItemRepository.findByWorkId(workId);
@@ -166,10 +221,18 @@ public void deleteWorkItem(Long workItemId) {
             .orElseThrow(() -> new IllegalArgumentException("WorkItem not found"));
     workItemRepository.delete(workItem);
 }
+    @Transactional
+    public List<WorkItemDto> getWorkItemsByWorkIdAndOtherUserId(Long workId, Long otherId) {
+        List<WorkItem> workItems = workItemRepository.findByWorkIdAndOtherUserId(workId, otherId);
 
-    public List<WorkItem> getWorkItemsByWorkIdAndOtherUserId(Long workId, Long otherId) {//특정 작업에 대한 특정 사용자의 모든 작업 항목 가져오기
-        return workItemRepository.findByWorkIdAndOtherUserId(workId, otherId);
-
+        return workItems.stream()
+                .map(workItem -> {
+                    WorkItemDto dto = workItemMapper.toDto(workItem);
+                    // Sign 정보를 Sign ID로만 설정하여 오류 방지
+                    dto.setSignId(workItem.getSign() != null ? workItem.getSign().getId() : null);
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     public void deleteWorkItemsByUserAndWork(Long userId, Long workId) {
@@ -182,12 +245,6 @@ public void deleteWorkItem(Long workItemId) {
 
     }
 
-//    @Transactional
-//    public WorkItemDto getWorkItemById(Long workItemId) {
-//        WorkItem workItem = workItemRepository.findById(workItemId)
-//                .orElseThrow(() -> new IllegalArgumentException("WorkItem not found with id: " + workItemId));
-//        return workItemMapper.toDto(workItem);
-//    }
 
 
 }

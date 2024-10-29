@@ -1,5 +1,6 @@
 package com.example.sign;
 
+import com.example.workItem.WorkItemDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,6 @@ public interface SignRepository extends JpaRepository<Sign, Long> {
     List<Sign> findByUserIdAndDeletedFalse(Long userId);
     //delete된 sign 찾기
     List<Sign> findByUserIdAndDeletedTrue(Long userId);
+
+    Optional<Object> findById(WorkItemDto workItemDto);
 }
