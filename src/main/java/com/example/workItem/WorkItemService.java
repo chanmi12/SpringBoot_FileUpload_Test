@@ -72,37 +72,38 @@ public class WorkItemService {
         return workItemMapper.toDto(workItem);
     }
     @Transactional
-    public WorkItem createWorkItem(WorkItemDto workItemDto, Long workId, Long userId, Long targetUserId, Long signId ) {
-        // Retrieve the Work entity
+    public WorkItem createWorkItem(WorkItemDto workItemDto, Long workId, Long userId, Long targetUserId) {
+        // Retrieve Work and User entities
         Work work = workRepository.findById(workId)
                 .orElseThrow(() -> new IllegalArgumentException("Work not found with id: " + workId));
-
-        // Retrieve the User entity
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
         User targetUser = userRepository.findById(targetUserId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + targetUserId));
+                .orElseThrow(() -> new IllegalArgumentException("Target User not found with id: " + targetUserId));
 
-        // Create WorkItem
+        // Retrieve Sign if signId is provided
+        Sign sign = null;
+        if (workItemDto.getSignId() != null) {
+            sign = signRepository.findById(workItemDto.getSignId())
+                    .orElseThrow(() -> new IllegalArgumentException("Sign not found with id: " + workItemDto.getSignId()));
+        }
+
+        // Create and set WorkItem properties
         WorkItem workItem = new WorkItem();
         workItem.setWork(work);
         workItem.setUser(targetUser);
 
-        // Assign fields based on type
+        // Handle each case individually
         switch (workItemDto.getType()) {
             case 1: // General Signature
                 workItem.setType(1);
+                workItem.setSign(sign); // Set sign if provided
                 workItem.setXPosition(workItemDto.getXPosition());
                 workItem.setYPosition(workItemDto.getYPosition());
                 workItem.setWidth(workItemDto.getWidth());
                 workItem.setHeight(workItemDto.getHeight());
-                workItem.setFree(false);
+                workItem.setFree(false); // Not free mode
                 workItem.setPage(workItemDto.getPage());
-
-                // Assign Sign if signId is provided
-                if (signId != null) {
-                    Sign sign = signRepository.findById(signId)
-                            .orElseThrow(() -> new IllegalArgumentException("Sign not found with id: " + signId));
-                    workItem.setSign(sign);
-                }
                 break;
 
             case 2: // General Text
@@ -112,37 +113,31 @@ public class WorkItemService {
                 workItem.setYPosition(workItemDto.getYPosition());
                 workItem.setWidth(workItemDto.getWidth());
                 workItem.setHeight(workItemDto.getHeight());
-                workItem.setFree(false);
+                workItem.setFree(false); // Not free mode
                 workItem.setPage(workItemDto.getPage());
                 workItem.setFontSize(workItemDto.getFontSize());
                 workItem.setFontStyle(workItemDto.getFontStyle());
                 break;
 
             case 3: // Free Signature
-                workItem.setType(1);
+                workItem.setType(1); // Same as signature but with free mode
+                workItem.setSign(sign); // Set sign if provided
                 workItem.setXPosition(workItemDto.getXPosition());
                 workItem.setYPosition(workItemDto.getYPosition());
                 workItem.setWidth(workItemDto.getWidth());
                 workItem.setHeight(workItemDto.getHeight());
-                workItem.setFree(true); // Free mode enabled
+                workItem.setFree(true); // Enable free mode
                 workItem.setPage(workItemDto.getPage());
-
-                // Assign Sign if signId is provided
-                if (signId != null) {
-                    Sign sign = signRepository.findById(signId)
-                            .orElseThrow(() -> new IllegalArgumentException("Sign not found with id: " + signId));
-                    workItem.setSign(sign);
-                }
                 break;
 
             case 4: // Free Text
-                workItem.setType(2);
+                workItem.setType(2); // Same as text but with free mode
                 workItem.setText(workItemDto.getText());
                 workItem.setXPosition(workItemDto.getXPosition());
                 workItem.setYPosition(workItemDto.getYPosition());
                 workItem.setWidth(workItemDto.getWidth());
                 workItem.setHeight(workItemDto.getHeight());
-                workItem.setFree(true); // Free mode enabled
+                workItem.setFree(true); // Enable free mode
                 workItem.setPage(workItemDto.getPage());
                 workItem.setFontSize(workItemDto.getFontSize());
                 workItem.setFontStyle(workItemDto.getFontStyle());
@@ -151,8 +146,7 @@ public class WorkItemService {
             default:
                 throw new IllegalArgumentException("Invalid type value: " + workItemDto.getType());
         }
-
-        // Save the WorkItem to the repository
+        // Save the WorkItem
         return workItemRepository.save(workItem);
     }
 

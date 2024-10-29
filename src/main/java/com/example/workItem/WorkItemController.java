@@ -38,15 +38,15 @@ private WorkItemMapper workItemMapper;
     }
 
     //workId에 해당하는 work에 userDto를 초대
-    @PostMapping("/{userId}/{workId}/{targetUserId}/{type}")public ResponseEntity<WorkItemDto> createWorkItem(
+    @PostMapping("/{userId}/{workId}/{targetUserId}/{type}")
+    public ResponseEntity<WorkItemDto> createWorkItem(
             @PathVariable Long userId,
             @PathVariable Long workId,
             @PathVariable Long targetUserId,
             @PathVariable Integer type,
-            @RequestBody WorkItemDto workItemDto,
-            @RequestParam(required = false) Long signId // Optional signId
+            @RequestBody WorkItemDto workItemDto
     ) {
-        WorkItem workItem = workItemService.createWorkItem(workItemDto, workId, userId, targetUserId, signId);
+        WorkItem workItem = workItemService.createWorkItem(workItemDto, workId, userId, targetUserId); // Removed signId
         return ResponseEntity.ok(workItemMapper.toDto(workItem));
     }
 
