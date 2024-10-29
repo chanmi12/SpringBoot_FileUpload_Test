@@ -1,5 +1,8 @@
 package com.example.user;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class UserMapper {
     // Map User entity to UserDto
     public static UserDto toDto(User user) {

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -13,7 +14,8 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private UserMapper userMapper;
     //모든 사용자 정보 조회
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
@@ -65,11 +67,20 @@ public class UserService {
     }
 
     public User findOrCreateUser(UserDto userDto) {
-        return userRepository.findByEmail(userDto.getEmail()).orElseGet(() -> {
-            User newUser = new User();
-            newUser.setName(userDto.getName());
-            newUser.setEmail(userDto.getEmail());
-            return userRepository.save(newUser);
-        });
+        Optional<User> existingUser = userRepository.findByEmail(userDto.getEmail());
+        if (existingUser.isPresent()) {
+            return existingUser.get();
+        }
+        // Create a new user if not found
+        User newUser = userMapper.toEntity(userDto);
+        if (newUser.getUniqueId() == null || newUser.getUniqueId().isEmpty()) {
+            // Generate or assign a unique ID
+            newUser.setUniqueId(generateUniqueId(userDto)); // ensure this method returns a unique identifier
+        }
+        return userRepository.save(newUser);
+    }
+    private String generateUniqueId(UserDto userDto) {
+        // Implement a unique ID generation strategy here, for example:
+        return UUID.randomUUID().toString();
     }
 }
