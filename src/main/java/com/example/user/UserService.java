@@ -3,6 +3,7 @@ package com.example.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -82,5 +83,23 @@ public class UserService {
     private String generateUniqueId(UserDto userDto) {
         // Implement a unique ID generation strategy here, for example:
         return UUID.randomUUID().toString();
+    }
+    //자동검색
+//    public List<UserDto> searchUsersByNameAndEmail(String name , String email){
+//        List<User> users = userRepository.findByNameContainingAndEmailContaining(name, email);
+//        return users.stream()
+//                .map(UserMapper::toDto)
+//                .collect(Collectors.toList());
+//    }
+//
+    public List<UserDto> searchUsersByName(String name){
+        List<User> users = userRepository.findByNameContaining(name);
+        return users.stream()
+                .map(UserMapper::toDto)
+                .collect(Collectors.toList());
+    }
+    public List<UserDto> searchUsersByNameAndEmail(String name, String email) {
+        List<User> users = userRepository.findByNameAndEmailContaining(name, email);
+        return users.stream().map(UserMapper::toDto).collect(Collectors.toList());
     }
 }

@@ -46,4 +46,30 @@ public class UserController {
         userService.deleteUser(userId);
         return ResponseEntity.ok().build();
     }
+    //자동검색 기능
+    @GetMapping("/search")
+    public ResponseEntity<List<UserDto>> searchUsers(@RequestParam String name , @RequestParam(required =false)String email){
+        List<UserDto> users = userService.searchUsersByNameAndEmail(name, email);
+        return ResponseEntity.ok(users);
+    }
+    //이름으로 검색
+    @GetMapping("/searchByName")
+    public ResponseEntity<List<UserDto>> searchByName(@RequestParam String name) {
+        List<UserDto> users = userService.searchUsersByName(name);
+        return ResponseEntity.ok(users);
+    }
+
+    //이메일로 검색
+    @GetMapping("/searchByEmail")
+    public ResponseEntity<List<UserDto>> searchByEmail(@RequestParam String name, @RequestParam String email) {
+        List<UserDto> users = userService.searchUsersByNameAndEmail(name, email);
+        return ResponseEntity.ok(users);
+    }
+
+//    //
+//    @PostMapping("/createOrFetch")
+//    public ResponseEntity<UserDto> createOrFetchUser(@RequestBody UserDto userDto) {
+//        UserDto result = userService.createOrFetchUser(userDto);
+//        return ResponseEntity.ok(result);
+//    }
 }
