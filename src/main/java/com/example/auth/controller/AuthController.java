@@ -21,7 +21,6 @@ public class AuthController {
     private final HisnetLoginService hisnetLoginService;
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> Login(@RequestBody LoginRequest request) {
-        System.out.println("Received login request: " + request);
         return ResponseEntity.ok(LoginResponse.from(authService.login(hisnetLoginService.callHisnetLoginApi(AuthDto.from(request)))));
     }
 }
