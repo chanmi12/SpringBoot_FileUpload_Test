@@ -1,6 +1,6 @@
 package com.example.user;
 
-import com.example.auth.dto.AuthDto;
+//import com.example.auth.dto.AuthDto;
 import com.example.sign.Sign;
 import com.example.userWorkItem.UserWorkItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -62,27 +62,27 @@ public class User {
    @JsonIgnore
     private List<Sign> signs; // User가 여러 개의 Sign을 가질 수 있음
 
-    public void update(AuthDto dto) {
-        this.name = dto.getName();
-        this.email = dto.getEmail();
-        this.grade = dto.getGrade();
-        this.semester = dto.getSemester();
-        this.department = dto.getDepartment();
-        this.major1 = dto.getMajor1();
-        this.major2 = dto.getMajor2();
-    }
-    public static User from(AuthDto dto) {
-        return User.builder()
-                .uniqueId(dto.getUniqueId())
-                .name(dto.getName())
-                .email(dto.getEmail())
-                .grade(dto.getGrade())
-                .semester(dto.getSemester())
-                .department(dto.getDepartment())
-                .major1(dto.getMajor1())
-                .major2(dto.getMajor2())
-                .build();
-    }
+//    public void update(AuthDto dto) {
+//        this.name = dto.getName();
+//        this.email = dto.getEmail();
+//        this.grade = dto.getGrade();
+//        this.semester = dto.getSemester();
+//        this.department = dto.getDepartment();
+//        this.major1 = dto.getMajor1();
+//        this.major2 = dto.getMajor2();
+//    }
+//    public static User from(AuthDto dto) {
+//        return User.builder()
+//                .uniqueId(dto.getUniqueId())
+//                .name(dto.getName())
+//                .email(dto.getEmail())
+//                .grade(dto.getGrade())
+//                .semester(dto.getSemester())
+//                .department(dto.getDepartment())
+//                .major1(dto.getMajor1())
+//                .major2(dto.getMajor2())
+//                .build();
+//    }
 
 
     @PrePersist
