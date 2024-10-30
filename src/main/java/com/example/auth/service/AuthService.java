@@ -22,26 +22,30 @@ public class AuthService {
     @Value("${custom.jwt.secret}")
     private String SECRET_KEY;
 
-    public User getLoginUser(Long uniqueId) {
+    public User getLoginUser(String uniqueId) {
         return userRepository
-                .findById(uniqueId)
+                .findByUniqueId(uniqueId)
                 .orElseThrow(() -> new DoNotExistException("해당 유저가 없습니다."));
     }
 
     public AuthDto login(AuthDto dto) {
-        Optional<User> user = userRepository.findById(Long.valueOf(dto.getUniqueId()));
+        Optional<User> user = userRepository.findByUniqueId(dto.getUniqueId());
+
         if (user.isEmpty()) {
+            // Register a new user if they don't exist
             User newUser = User.from(dto);
-            userRepository.save(User.from(dto));
+            userRepository.save(newUser);
+
             return AuthDto.builder()
                     .token(JwtUtil.createToken(newUser.getUniqueId(), newUser.getName(), SECRET_KEY))
                     .build();
+
         } else {
+            // Update the existing user if they are found
             user.get().update(dto);
+
             return AuthDto.builder()
-                    .token(
-                            JwtUtil.createToken(
-                                    user.get().getUniqueId(), user.get().getName(), SECRET_KEY))
+                    .token(JwtUtil.createToken(user.get().getUniqueId(), user.get().getName(), SECRET_KEY))
                     .build();
         }
     }
