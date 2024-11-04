@@ -120,7 +120,7 @@ public class WorkItemService {
                 break;
 
             case 3: // Free Signature
-                workItem.setType(1); // Same as signature but with free mode
+                workItem.setType(3); // Same as signature but with free mode
                 workItem.setSign(sign); // Set sign if provided
                 workItem.setXPosition(workItemDto.getXPosition());
                 workItem.setYPosition(workItemDto.getYPosition());
@@ -131,7 +131,7 @@ public class WorkItemService {
                 break;
 
             case 4: // Free Text
-                workItem.setType(2); // Same as text but with free mode
+                workItem.setType(4); // Same as text but with free mode
                 workItem.setText(workItemDto.getText());
                 workItem.setXPosition(workItemDto.getXPosition());
                 workItem.setYPosition(workItemDto.getYPosition());
