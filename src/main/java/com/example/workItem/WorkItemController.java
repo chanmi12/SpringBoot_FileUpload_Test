@@ -56,10 +56,11 @@ private WorkItemMapper workItemMapper;
         List<WorkItemDto> workItems = workItemService.findByWorkId(workId);
         return ResponseEntity.ok(workItems);
     }
-    @GetMapping("/{userId}/{workId}/workItem/{otherId}") //특정 Work에 속한 특정 User의 WorkItem 조회
+    @GetMapping("/{userId}/{workId}/workItem/{otherId}")//특정 Work에 속한 특정 User의 WorkItem 조회
     public ResponseEntity<List<WorkItemDto>> getWorkItemByWorkIdAndOtherUserId(
             @PathVariable Long workId, @PathVariable Long otherId) {
 
+        // Service 레이어에서 WorkItemDto로 반환하여 가져옴
         List<WorkItemDto> workItemDtos = workItemService.getWorkItemsByWorkIdAndOtherUserId(workId, otherId);
 
         return ResponseEntity.ok(workItemDtos);

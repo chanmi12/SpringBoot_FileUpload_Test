@@ -27,7 +27,7 @@ public class WorkItemMapper {
         dto.setPage(workItem.getPage());
         dto.setFontSize(workItem.getFontSize());
         dto.setFontStyle(workItem.getFontStyle());
-
+        dto.setAutoCreated(workItem.getAutoCreated());
         // Map signId if Sign is not null and populate full Sign details
         if (workItem.getSign() != null) {
             dto.setSignId(workItem.getSign().getId());
@@ -61,7 +61,7 @@ public class WorkItemMapper {
         workItem.setPage(dto.getPage());
         workItem.setFontSize(dto.getFontSize());
         workItem.setFontStyle(dto.getFontStyle());
-
+        workItem.setAutoCreated(dto.getAutoCreated());
         return workItem;
     }
 

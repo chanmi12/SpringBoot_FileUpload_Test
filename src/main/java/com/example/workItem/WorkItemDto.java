@@ -30,6 +30,6 @@ public class WorkItemDto {
     private Integer fontSize;
     private String fontStyle;
     private SignDto sign; // Includes Sign details as a nested DTO
-
+    private Boolean autoCreated; // Added for auto-created WorkItems
     // Custom constructor or methods if needed for special cases
 }

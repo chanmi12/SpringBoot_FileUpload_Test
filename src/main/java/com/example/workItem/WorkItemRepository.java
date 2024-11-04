@@ -24,6 +24,7 @@ public interface WorkItemRepository extends JpaRepository<WorkItem,Long> {
     @Query("SELECT DISTINCT wi.user.id FROM WorkItem wi WHERE wi.work.id = :workId")
     List<Long> findDistinctUserIdsByWorkId(@Param("workId") Long workId); // 특정 Work에 대한 모든 User ID를 반환하는 쿼리
 
+    // AutoCreate가 false인 작업 ID 및 사용자 ID로 모든 작업 항목 찾기
     List<WorkItem> findByWorkIdAndUserIdAndAutoCreatedFalse(Long workId, Long userId);
 
 }
