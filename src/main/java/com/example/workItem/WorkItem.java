@@ -78,6 +78,8 @@ public class WorkItem {
     @Column(name = "fontStyle", length = 255, nullable = true)
     private String fontStyle;
 
+    @Column(name = "autoCreated", nullable = true)
+    private Boolean autoCreated;
     public WorkItem(Work work, User creator) {
         this.work = work;
         this.user = creator;

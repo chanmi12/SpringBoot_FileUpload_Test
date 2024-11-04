@@ -53,7 +53,7 @@ public class WorkItemService {
         workItem.setWork(work);
         workItem.setUser(user); // Assign the non-null User
         workItem.setType(1); //Default type
-
+        workItem.setAutoCreated(true); // Set autoCreated to true
 
         // Ensure the 'type' field is set to a non-null value
         workItem.setType(1); // Set this to a default type, or derive it from your business logic.
@@ -92,7 +92,7 @@ public class WorkItemService {
         WorkItem workItem = new WorkItem();
         workItem.setWork(work);
         workItem.setUser(targetUser);
-
+        workItem.setAutoCreated(false); // Set autoCreated to false
         // Handle each case individually
         switch (workItemDto.getType()) {
             case 1: // General Signature
@@ -225,7 +225,7 @@ public void deleteWorkItem(Long workItemId) {
 }
     @Transactional
     public List<WorkItemDto> getWorkItemsByWorkIdAndOtherUserId(Long workId, Long otherId) {
-        List<WorkItem> workItems = workItemRepository.findByWorkIdAndOtherUserId(workId, otherId);
+        List<WorkItem> workItems = workItemRepository.findByWorkIdAndUserIdAndAutoCreatedFalse(workId, otherId);
 
         return workItems.stream()
                 .map(workItem -> {
