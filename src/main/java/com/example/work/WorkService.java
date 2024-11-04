@@ -209,11 +209,19 @@ public class WorkService {
         }
         workRepository.save(work);
     }
-    //공유된 Work 조회
+    //생성자는 자신이다 공유된 Work 조회
     @Transactional
     public List<WorkDto> getSharedWorksByUserId(Long userId){
         List<Work> sharedWorks = workRepository.findByUserIdAndSharedTrue(userId);
         return sharedWorks.stream()
+                .map(workMapper::toDto)
+                .collect(Collectors.toList());
+    }
+    //생성자는 상관이 없다. 공유된 Work 조회
+    @Transactional
+    public List<WorkDto> getWorksSharedWithUser(Long userId){
+        List<Work> worksSharedWithUser = workRepository.findWorksSharedWithUser(userId);
+        return worksSharedWithUser.stream()
                 .map(workMapper::toDto)
                 .collect(Collectors.toList());
     }

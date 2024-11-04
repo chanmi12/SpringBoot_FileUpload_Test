@@ -121,10 +121,16 @@ public class WorkController{
         workService.updateWorkSharedStatus(workId, userId);
         return ResponseEntity.ok().build();
     }
-
+    //생성자는 자신이며 , 공유된 작업 조회
     @GetMapping("/{userId}/works/shared")
     public ResponseEntity<List<WorkDto>> getSharedWorks(@PathVariable Long userId) {
         List<WorkDto> sharedWorks = workService.getSharedWorksByUserId(userId);
+        return ResponseEntity.ok(sharedWorks);
+    }
+    //생성자 상관없이, 공유된 작업 조회
+    @GetMapping("/{userId}/works/sharedWithMe")
+    public ResponseEntity<List<WorkDto>> getWorksSharedWithUser(@PathVariable Long userId){
+        List<WorkDto> sharedWorks = workService.getWorksSharedWithUser(userId);
         return ResponseEntity.ok(sharedWorks);
     }
 }
