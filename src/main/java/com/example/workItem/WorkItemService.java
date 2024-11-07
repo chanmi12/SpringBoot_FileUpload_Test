@@ -54,7 +54,7 @@ public class WorkItemService {
         workItem.setUser(user); // Assign the non-null User
         workItem.setType(1); //Default type
         workItem.setAutoCreated(true); // Set autoCreated to true
-
+        workItem.setFinished(false); // Set finished to false
         // Ensure the 'type' field is set to a non-null value
         workItem.setType(1); // Set this to a default type, or derive it from your business logic.
 
@@ -92,7 +92,8 @@ public class WorkItemService {
         WorkItem workItem = new WorkItem();
         workItem.setWork(work);
         workItem.setUser(targetUser);
-        workItem.setAutoCreated(false); // Set autoCreated to false
+        workItem.setAutoCreated(false); // Set autoCreated to false\
+        workItem.setFinished(false); // Set finished to false
         // Handle each case individually
         switch (workItemDto.getType()) {
             case 1: // General Signature
@@ -233,6 +234,12 @@ public class WorkItemService {
         }
         if (workItemDto.getFontStyle() != null) {
             workItem.setFontStyle(workItemDto.getFontStyle());
+        }
+        if (workItemDto.getAutoCreated() != null) {
+            workItem.setAutoCreated(workItemDto.getAutoCreated());
+        }
+        if (workItemDto.getFinished() != null) {
+            workItem.setFinished(workItemDto.getFinished());
         }
         //Save the updated WorkItem
        WorkItem updatedWorkItem = workItemRepository.save(workItem);

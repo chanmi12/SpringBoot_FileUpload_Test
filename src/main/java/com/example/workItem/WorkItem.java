@@ -71,6 +71,8 @@ public class WorkItem {
 
     @Column(name = "page", nullable = true)
     private Integer page;
+    @Column(name ="finished", nullable = true)
+    private Boolean finished;
 
     @Column(name = "fontSize", nullable = true)
     private Integer fontSize;

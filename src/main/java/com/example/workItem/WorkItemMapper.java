@@ -24,6 +24,7 @@ public class WorkItemMapper {
         dto.setWidth(workItem.getWidth());
         dto.setHeight(workItem.getHeight());
         dto.setFree(workItem.getFree());
+        dto.setFinished(workItem.getFinished());
         dto.setPage(workItem.getPage());
         dto.setFontSize(workItem.getFontSize());
         dto.setFontStyle(workItem.getFontStyle());
@@ -58,6 +59,7 @@ public class WorkItemMapper {
         workItem.setWidth(dto.getWidth());
         workItem.setHeight(dto.getHeight());
         workItem.setFree(dto.getFree());
+        workItem.setFinished(dto.getFinished());
         workItem.setPage(dto.getPage());
         workItem.setFontSize(dto.getFontSize());
         workItem.setFontStyle(dto.getFontStyle());

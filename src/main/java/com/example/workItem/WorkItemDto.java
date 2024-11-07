@@ -26,6 +26,7 @@ public class WorkItemDto {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
     private Boolean free;
+    private Boolean finished;
     private Integer page;
     private Integer fontSize;
     private String fontStyle;
