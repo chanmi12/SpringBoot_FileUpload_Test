@@ -6,5 +6,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class LoginRequest {
-    private String hisnetToken;
+    private String token;
 }

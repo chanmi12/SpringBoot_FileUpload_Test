@@ -27,6 +27,7 @@ public class User {
     @Column(name = "unique_id", nullable = false, length = 50)
     private String uniqueId;
 
+
     private String name;
 
     @Column(name = "email" )
@@ -62,6 +63,17 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
    @JsonIgnore
     private List<Sign> signs; // User가 여러 개의 Sign을 가질 수 있음
+
+    public User(AuthDto authDto) {
+        this.uniqueId = authDto.getUniqueId();
+        this.name = authDto.getName();
+        this.email = authDto.getEmail();
+        this.grade = authDto.getGrade();
+        this.semester = authDto.getSemester();
+        this.department = authDto.getDepartment();
+        this.major1 = authDto.getMajor1();
+        this.major2 = authDto.getMajor2();
+    }
 
     public void update(AuthDto dto) {
         this.name = dto.getName();

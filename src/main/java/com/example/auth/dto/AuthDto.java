@@ -25,6 +25,6 @@ public class AuthDto {
     }
 
     public static AuthDto from(LoginRequest request) {
-        return AuthDto.builder().hisnetToken(request.getHisnetToken()).build();
+        return AuthDto.builder().hisnetToken(request.getToken()).build();
     }
 }
