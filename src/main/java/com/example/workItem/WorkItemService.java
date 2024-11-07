@@ -199,17 +199,41 @@ public class WorkItemService {
         }else{//Sign이 없으면 null로 설정
             workItem.setSign(null);
         }
+
         //WorkItemDto의 필드를 업데이트한다.
-        workItem.setType(workItemDto.getType());
-        workItem.setText(workItemDto.getText());
-        workItem.setXPosition(workItemDto.getXPosition());
-        workItem.setYPosition(workItemDto.getYPosition());
-        workItem.setWidth(workItemDto.getWidth());
-        workItem.setHeight(workItemDto.getHeight());
-        workItem.setFree(workItemDto.getFree());
-        workItem.setPage(workItemDto.getPage());
-        workItem.setFontSize(workItemDto.getFontSize());
-        workItem.setFontStyle(workItemDto.getFontStyle());
+        if(workItemDto.getType() != null){
+            workItem.setType(workItemDto.getType());
+        }
+        if (workItemDto.getType() != null) {
+            workItem.setType(workItemDto.getType());
+        }
+        if (workItemDto.getText() != null) {
+            workItem.setText(workItemDto.getText());
+        }
+        if (workItemDto.getXPosition() != null) {
+            workItem.setXPosition(workItemDto.getXPosition());
+        }
+        if (workItemDto.getYPosition() != null) {
+            workItem.setYPosition(workItemDto.getYPosition());
+        }
+        if (workItemDto.getWidth() != null) {
+            workItem.setWidth(workItemDto.getWidth());
+        }
+        if (workItemDto.getHeight() != null) {
+            workItem.setHeight(workItemDto.getHeight());
+        }
+        if (workItemDto.getFree() != null) {
+            workItem.setFree(workItemDto.getFree());
+        }
+        if (workItemDto.getPage() != null) {
+            workItem.setPage(workItemDto.getPage());
+        }
+        if (workItemDto.getFontSize() != null) {
+            workItem.setFontSize(workItemDto.getFontSize());
+        }
+        if (workItemDto.getFontStyle() != null) {
+            workItem.setFontStyle(workItemDto.getFontStyle());
+        }
         //Save the updated WorkItem
        WorkItem updatedWorkItem = workItemRepository.save(workItem);
 

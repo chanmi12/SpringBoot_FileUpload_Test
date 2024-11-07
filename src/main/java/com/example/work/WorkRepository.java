@@ -14,6 +14,7 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
     List<Work> findByUserIdAndTrashedFalse(Long userId); // 사용자 ID로 휴지통에 없는 작업 찾기
     List<Work> findByUserIdAndSharedTrue(Long userId); // 사용자 ID로 공유된 작업 찾기
 
-    @Query("SELECT w FROM Work w JOIN w.workItems wi WHERE wi.user.id = :userId")
-    List<Work> findWorksSharedWithUser(@Param("userId") Long userId);
+    @Query("SELECT w FROM Work w JOIN w.workItems wi WHERE wi.user.id = :userId AND w.trashed = false")
+    List<Work> findWorksSharedWithUserNotTrashed(@Param("userId") Long userId);
+
 }
