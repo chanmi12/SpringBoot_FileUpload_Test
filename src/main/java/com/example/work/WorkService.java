@@ -219,8 +219,8 @@ public class WorkService {
     }
     //생성자는 상관이 없다. 공유된 Work 조회
     @Transactional
-    public List<WorkDto> getWorksSharedWithUser(Long userId){
-        List<Work> worksSharedWithUser = workRepository.findWorksSharedWithUser(userId);
+    public List<WorkDto> getWorksSharedWithUserNotTrashed(Long userId){
+        List<Work> worksSharedWithUser = workRepository.findWorksSharedWithUserNotTrashed(userId);
         return worksSharedWithUser.stream()
                 .map(workMapper::toDto)
                 .collect(Collectors.toList());
