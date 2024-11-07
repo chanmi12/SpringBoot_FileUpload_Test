@@ -38,6 +38,11 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
     implementation 'io.jsonwebtoken:jjwt:0.9.1' // JWT 라이브러리 추가
+//    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+//    implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+//    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+//    implementation 'javax.xml.bind:jaxb-api:2.3.1' // JAXB API 추가
+//    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.3' // JAXB 런타임 추가
 }
 
 tasks.named('test') {

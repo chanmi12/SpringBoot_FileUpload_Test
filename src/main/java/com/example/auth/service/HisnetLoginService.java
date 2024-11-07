@@ -40,10 +40,8 @@ public class HisnetLoginService {
         UriComponents uri = UriComponentsBuilder.fromHttpUrl(url).build();
 
         try {
-            ParameterizedTypeReference<Map<String, Object>> typeRef =
-                    new ParameterizedTypeReference<>() {};
-            ResponseEntity<Map<String, Object>> resultMap =
-                    restTemplate.exchange(uri.toString(), HttpMethod.POST, entity, typeRef);
+            ParameterizedTypeReference<Map<String, Object>> typeRef = new ParameterizedTypeReference<>() {};
+            ResponseEntity<Map<String, Object>> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.POST, entity, typeRef);
             Map<String, Object> result = resultMap.getBody();
             assert result != null;
             return AuthDto.builder()

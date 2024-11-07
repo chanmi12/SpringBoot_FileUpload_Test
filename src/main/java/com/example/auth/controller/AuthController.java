@@ -7,10 +7,7 @@ import com.example.auth.service.AuthService;
 import com.example.auth.service.HisnetLoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -20,7 +17,9 @@ public class AuthController {
     private final AuthService authService;
     private final HisnetLoginService hisnetLoginService;
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> Login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(LoginResponse.from(authService.login(hisnetLoginService.callHisnetLoginApi(AuthDto.from(request)))));
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        AuthDto authDto = hisnetLoginService.callHisnetLoginApi(new AuthDto(request.getHisnetToken()));
+        return ResponseEntity.ok(LoginResponse.from(authService.login(authDto)));
     }
+
 }

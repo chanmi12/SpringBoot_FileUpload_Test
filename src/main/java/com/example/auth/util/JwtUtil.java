@@ -37,4 +37,11 @@ public class JwtUtil {
             throw new WrongTokenException("유효하지 않은 토큰입니다.");
         }
     }
+    public static String extractUniqueId(String token, String secretKey) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
 }

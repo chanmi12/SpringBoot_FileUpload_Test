@@ -20,6 +20,10 @@ public class AuthDto {
     private Integer grade;
     private Integer semester;
 
+    public AuthDto(String hisnetToken) {
+        this.hisnetToken = hisnetToken;
+    }
+
     public static AuthDto from(LoginRequest request) {
         return AuthDto.builder().hisnetToken(request.getHisnetToken()).build();
     }

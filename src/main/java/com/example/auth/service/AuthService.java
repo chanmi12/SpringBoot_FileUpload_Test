@@ -48,5 +48,20 @@ public class AuthService {
                     .token(JwtUtil.createToken(user.get().getUniqueId(), user.get().getName(), SECRET_KEY))
                     .build();
         }
+
+    }
+    public AuthDto getStudentInfoByToken(String token) {
+        String uniqueId = JwtUtil.extractUniqueId(token, SECRET_KEY);
+        User user = getLoginUser(uniqueId);
+        return AuthDto.builder()
+                .uniqueId(user.getUniqueId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .department(user.getDepartment())
+                .major1(user.getMajor1())
+                .major2(user.getMajor2())
+                .grade(user.getGrade())
+                .semester(user.getSemester())
+                .build();
     }
 }
