@@ -24,11 +24,10 @@ public class SignController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<SignDto> createSign(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
-        SignDto signDto = signService.createSign(userId, file);
-        return ResponseEntity.ok(signDto);
+    public ResponseEntity<Long> createSign(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
+        Long signId = signService.createSign(userId, file);
+        return ResponseEntity.ok(signId);
     }
-
     // Update an existing sign
 //    @PutMapping("/update/{signId}")
 //    public ResponseEntity<SignDto> updateSign(

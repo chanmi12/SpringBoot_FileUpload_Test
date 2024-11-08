@@ -97,7 +97,9 @@ public class User {
                 .build();
     }
 
-
+    public void updateLoginTime() {
+        this.loginTime = LocalDateTime.now();
+    }
     @PrePersist
     protected void onCreate() {
         this.createDate = LocalDateTime.now();

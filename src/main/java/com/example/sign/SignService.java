@@ -47,7 +47,8 @@ public class SignService {
 //        return signMapper.toDto(savedSign);
 //    }
 
-    public SignDto createSign (Long userId, MultipartFile file){
+    @Transactional
+    public Long createSign (Long userId, MultipartFile file){
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("User not found for given id" + userId));
 
@@ -61,10 +62,10 @@ public class SignService {
         sign.setUpdateDate(LocalDateTime.now());
 
         Sign savedSign = signRepository.save(sign);
-        SignDto signDto = signMapper.toDto(savedSign);
-        signDto.setUserId(user.getId());
 
-        return signDto;
+        //SignDto signDto = signMapper.toDto(savedSign);
+        //signDto.setUserId(user.getId());
+        return savedSign.getId();
     }
 //    @Transactional
 //    public SignDto updateSign(Long userId, Long signId, MultipartFile file){
