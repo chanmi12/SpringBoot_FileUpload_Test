@@ -29,7 +29,6 @@ public class WorkService {
         if (file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty");
         }
-        //파일 업로드
         String fileUrl = awsS3Service.uploadFile("file", file);
         Work work = new Work();
         work.setUserId(userId);
@@ -39,35 +38,41 @@ public class WorkService {
 
         return "File uploaded successfully. Work ID: " + work.getId();
     }
+    //Work에서 User의 수를 반환 하는 함수
+    private int getUserCount(Long workId) {
+        return workItemRepository. countDistinctUsersByWorkId(workId);
+    }
 
     //유저의 Work 목록 조회
     public List<WorkDto> getUserWorks(Long userId) {
         List<Work> works = workRepository.findByUserId(userId);
         return works.stream()
-                .map(workMapper::toDto)
+                .map(work -> workMapper.toDto(work, getUserCount(work.getId())))
                 .collect(Collectors.toList());
     }
 
     //유저의 Work 조회
     public WorkDto getWorkByIdAndUserId(Long userId, Long workId) {
         Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
-        return workOpt.map(workMapper::toDto).orElse(null);
+        return workOpt.map(work -> workMapper.toDto(work, getUserCount(work.getId()))).orElse(null);
     }
 
     //Work 파일 업데이트
     public String updateWorkFile(Long workId, Long userId, MultipartFile file) {
+        //Work ID와 User ID로 Work 찾기
         Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
         if (!workOpt.isPresent()) {
             throw new IllegalArgumentException("Work not found for given id and user");
         }
+        //Work 업데이트
         Work existingWork = workOpt.get();
-
-        //S3에서 기존 파일 삭제
+        //기존 파일 삭제
         awsS3Service.deleteFileFromS3(existingWork.getPath());
-
         //새로운 파일 업로드
         String newFileUrl = awsS3Service.uploadFile("file", file);
+        //Work 업데이트
         existingWork.setPath(newFileUrl);
+        //Work 저장
         workRepository.save(existingWork);
 
         return newFileUrl;
@@ -78,10 +83,8 @@ public class WorkService {
         Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
         if (workOpt.isPresent()) {
             Work work = workOpt.get();
-
-            awsS3Service.deleteFileFromS3(work.getPath()); // Delete from S3
-            workRepository.deleteById(workId); // Delete from DB
-
+            awsS3Service.deleteFileFromS3(work.getPath());
+            workRepository.deleteById(workId);
             return "Work ID " + workId + " deleted successfully.";
         }
         return null;
@@ -91,23 +94,10 @@ public class WorkService {
     public List<WorkDto> getAllWorks() {
         List<Work> works = workRepository.findAll();
         return works.stream()
-                .map(workMapper::toDto)
+                .map(work -> workMapper.toDto(work, getUserCount(work.getId())))
                 .collect(Collectors.toList());
     }
 
-//    //Work 공유 상태 변경
-//    public String updateWorkSharedStatus (Long userId , Long workId, boolean sharedStatus){
-//        Optional<Work> workOpt = workRepository.findByIdAndUserId(workId, userId);
-//        if (workOpt.isPresent()) {
-//
-//            Work work = workOpt.get();
-//            work.setShared(sharedStatus);
-//            workRepository.save(work);
-//            return "Work ID: " + workId + " shared status updated to : " + sharedStatus;
-//        }else{
-//            throw new IllegalArgumentException("Work ID: " + workId + " not found");
-//        }
-//    }
 
     //Work 부분 수정
     @Transactional
@@ -147,7 +137,7 @@ public class WorkService {
         }
 
         workRepository.save(existingWork);
-        return workMapper.toDto(existingWork);
+        return workMapper.toDto(existingWork, getUserCount(existingWork.getId()));
     }
 
     //휴지통
@@ -178,15 +168,15 @@ public class WorkService {
     public List<WorkDto> getTrashedWorksByUserId(Long userId) { // 휴지통 조회
         List<Work> trashedWorks = workRepository.findByUserIdAndTrashedTrue(userId);
         return trashedWorks.stream()
-                .map(workMapper::toDto)
+                .map(work -> workMapper.toDto(work, getUserCount(work.getId())))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public List<WorkDto> getNotTrashedWorksByUserId(Long userId) { // 휴지통이 아닌 파일 조회
+    public List<WorkDto> getNotTrashedWorksByUserId(Long userId) { // 휴지통에 없는 Work 조회
         List<Work> notTrashedWorks = workRepository.findByUserIdAndTrashedFalse(userId);
         return notTrashedWorks.stream()
-                .map(workMapper::toDto)
+                .map(work -> workMapper.toDto(work, getUserCount(work.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -201,28 +191,26 @@ public class WorkService {
     Work work = workOpt.get();
 
         //특정 Work에 대한 모든 User ID를 반환하는 쿼리
-        List <Long> distinctUserIds = workItemRepository.findDistinctUserIdsByWorkId(workId);
-        if(distinctUserIds.size()>1){ //공유된 Work
-            work.setShared(true);
-        }else{//공유되지 않은 Work
-            work.setShared(false);
-        }
+        List<Long> distinctUserIds = workItemRepository.findDistinctUserIdsByWorkId(workId);
+        work.setShared(distinctUserIds.size() > 1);
+
         workRepository.save(work);
     }
+
     //생성자는 자신이다 공유된 Work 조회
     @Transactional
-    public List<WorkDto> getSharedWorksByUserId(Long userId){
+    public List<WorkDto> getSharedWorksByUserId(Long userId) {
         List<Work> sharedWorks = workRepository.findByUserIdAndSharedTrue(userId);
         return sharedWorks.stream()
-                .map(workMapper::toDto)
+                .map(work -> workMapper.toDto(work, getUserCount(work.getId())))
                 .collect(Collectors.toList());
     }
     //생성자는 상관이 없다. 공유된 Work 조회
     @Transactional
-    public List<WorkDto> getWorksSharedWithUserNotTrashed(Long userId){
+    public List<WorkDto> getWorksSharedWithUserNotTrashed(Long userId) {
         List<Work> worksSharedWithUser = workRepository.findWorksSharedWithUserNotTrashed(userId);
         return worksSharedWithUser.stream()
-                .map(workMapper::toDto)
+                .map(work -> workMapper.toDto(work, getUserCount(work.getId())))
                 .collect(Collectors.toList());
     }
 }

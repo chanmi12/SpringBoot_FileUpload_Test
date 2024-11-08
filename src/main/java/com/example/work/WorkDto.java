@@ -26,5 +26,5 @@ public class WorkDto {
     private LocalDateTime updateDate;
     private LocalDateTime openDate;
     private LocalDateTime deleteDate;
-
+    private Integer userCount;
 }

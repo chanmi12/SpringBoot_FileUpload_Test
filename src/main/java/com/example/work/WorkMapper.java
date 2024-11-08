@@ -4,12 +4,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class WorkMapper {
-    //Work 객체를 WorkDto 객체로 변환
-    public WorkDto toDto(Work work) {
+
+    //WorkDto 객체를 Work 객체로 변환
+    public WorkDto toDto(Work work, int userCount) {
         if (work == null) {
             return null;
         }
-
         return new WorkDto(
                 work.getId(),
                 work.getUserId(),
@@ -23,15 +23,15 @@ public class WorkMapper {
                 work.getCreateDate(),
                 work.getUpdateDate(),
                 work.getOpenDate(),
-                work.getDeleteDate()
+                work.getDeleteDate(),
+                userCount // userCount 설정
         );
     }
-    //WorkDto 객체를 Work 객체로 변환
+
     public static Work toEntity(WorkDto workDto) {
         if (workDto == null) {
             return null;
         }
-
         Work work = new Work();
         work.setId(workDto.getId());
         work.setUserId(workDto.getUserId());
@@ -46,7 +46,6 @@ public class WorkMapper {
         work.setUpdateDate(workDto.getUpdateDate());
         work.setOpenDate(workDto.getOpenDate());
         work.setDeleteDate(workDto.getDeleteDate());
-
         return work;
     }
 
