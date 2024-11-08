@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -19,12 +19,7 @@ public class AuthController {
     private final AuthService authService;
     @Autowired
     private final HisnetLoginService hisnetLoginService;
-//    @PostMapping("/login")
-//    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-////        AuthDto authDto = hisnetLoginService.callHisnetLoginApi(new AuthDto(request.getHisnetToken()));
-////        return ResponseEntity.ok(LoginResponse.from(authService.login(authDto)));
-//
-//    }
+
 @PostMapping("/login")
 public ResponseEntity<Long> login(@RequestBody LoginRequest request) {
     // HisnetLoginService를 사용하여 사용자 정보를 가져옴
