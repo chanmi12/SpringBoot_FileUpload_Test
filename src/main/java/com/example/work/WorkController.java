@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -132,6 +133,12 @@ public class WorkController{
     public ResponseEntity<List<WorkDto>> getWorksSharedWithUser(@PathVariable Long userId){
         List<WorkDto> sharedWorks = workService.getWorksSharedWithUserNotTrashed(userId);
         return ResponseEntity.ok(sharedWorks);
+    }
+    //작업 상세 조회
+    @GetMapping("/works/{workId}/details")
+    public ResponseEntity<WorkDto> getWorkDetails(@PathVariable Long workId) {
+        WorkDto workDto = workService.getWorkDetails(workId);
+        return ResponseEntity.ok(workDto);
     }
 }
 /* 이전 버전

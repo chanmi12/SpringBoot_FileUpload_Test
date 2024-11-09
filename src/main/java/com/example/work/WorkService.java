@@ -213,4 +213,14 @@ public class WorkService {
                 .map(work -> workMapper.toDto(work, getUserCount(work.getId())))
                 .collect(Collectors.toList());
     }
+    //Work 상세 조회
+    public WorkDto getWorkDetails(Long workId) {
+        Optional<Work> workOpt = workRepository.findById(workId);
+        if (!workOpt.isPresent()) {
+            throw new IllegalArgumentException("Work not found for given id");
+        }
+        Work work = workOpt.get();
+        return workMapper.toDto(work, getUserCount(work.getId()));
+    }
+
 }
