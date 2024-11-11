@@ -24,8 +24,8 @@ public class SignController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<Long> createSign(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
-        Long signId = signService.createSign(userId, file);
+    public ResponseEntity<Long> createSign(@PathVariable Long userId, @RequestParam("file") MultipartFile file, @RequestParam("deleted") boolean deleted) {
+        Long signId = signService.createSign(userId, file, deleted);
         return ResponseEntity.ok(signId);
     }
     // Update an existing sign

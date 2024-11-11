@@ -27,28 +27,8 @@ public class SignService {
     @Autowired
     private AwsS3Service awsS3Service;
 
-
-
-//    public SignDto createSign(Long userId, MultipartFile file){
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new IllegalArgumentException("User not found for given id"));
-//
-//        String fileUrl = awsS3Service.uploadFile("sign", file);
-//
-//        Sign sign = new Sign();
-//        sign.setUser(user);
-//        sign.setPath(fileUrl);
-//        sign.setDeleted(false);
-//        sign.setCreateDate(LocalDateTime.now());
-//        sign.setUpdateDate(LocalDateTime.now());
-//
-//        Sign savedSign = signRepository.save(sign);
-//
-//        return signMapper.toDto(savedSign);
-//    }
-
     @Transactional
-    public Long createSign (Long userId, MultipartFile file){
+    public Long createSign (Long userId, MultipartFile file, boolean deleted){
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("User not found for given id" + userId));
 
@@ -57,29 +37,16 @@ public class SignService {
         Sign sign = new Sign();
         sign.setUser(user); //User 세팅
         sign.setPath(fileUrl);
-        sign.setDeleted(false);
+        sign.setDeleted(deleted);
         sign.setCreateDate(LocalDateTime.now());
         sign.setUpdateDate(LocalDateTime.now());
 
         Sign savedSign = signRepository.save(sign);
 
-        //SignDto signDto = signMapper.toDto(savedSign);
-        //signDto.setUserId(user.getId());
         return savedSign.getId();
     }
-//    @Transactional
-//    public SignDto updateSign(Long userId, Long signId, MultipartFile file){
-//        Sign sign = signRepository.findByIdAndUserId(signId, userId)
-//                .orElseThrow(() -> new IllegalArgumentException("Sign not found for given id and user"));
-//        String fileUrl = awsS3Service.uploadFile("sign", file);
-//        sign.setPath(fileUrl);
-//        sign.setUpdateDate(LocalDateTime.now());
-//
-//        Sign updatedSign = signRepository.save(sign);
-//
-//        return signMapper.toDto(updatedSign);
-//    }
 
+    @Transactional
     public String updateSignFile(Long signId, Long userId, MultipartFile file){
         Optional <Sign> signOpt = signRepository.findByIdAndUserId(signId, userId);
         if(!signOpt.isPresent()){

@@ -38,7 +38,6 @@ public class Sign {
     protected void onCreate() {
         this.createDate = LocalDateTime.now();
         this.updateDate = LocalDateTime.now();
-        this.deleted=false;
     }
 
     @PreUpdate
