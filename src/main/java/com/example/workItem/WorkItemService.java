@@ -190,19 +190,29 @@ public class WorkItemService {
                 .map(user -> new UserDto(user.getId(), user.getName(), user.getEmail())) // Convert User to UserDto
                 .collect(Collectors.toList()); // Collect as a list of UserDto
     }
-@Transactional
+    @Transactional
     public WorkItemDto updateWorkItem(Long workItemId, WorkItemDto workItemDto){ //ID로 작업 항목 업데이트
         //WorkItem 엔티티를 찾아서 가져온다.
         WorkItem workItem = workItemRepository.findById(workItemId)
                 .orElseThrow(() -> new IllegalArgumentException("WorkItem not found"));
-        //Sign이 존재하면 Sign을 가져와서 WorkItem에 설정한다.
-        if (workItemDto.getSignId() != null && workItemDto.getSignId() > 0) {
-            Sign sign = signRepository.findById(workItemDto.getSignId())
-                    .orElseThrow(() -> new IllegalArgumentException("Sign not found with id: " + workItemDto.getSignId()));
-            workItem.setSign(sign);
-        }else{//Sign이 없으면 null로 설정
-            workItem.setSign(null);
-        }
+
+//        //Sign이 존재하면 Sign을 가져와서 WorkItem에 설정한다.
+//        if (workItemDto.getSignId() != null && workItemDto.getSignId() > 0) {
+//            Sign sign = signRepository.findById(workItemDto.getSignId())
+//                    .orElseThrow(() -> new IllegalArgumentException("Sign not found with id: " + workItemDto.getSignId()));
+//            workItem.setSign(sign);
+//        }else{//Sign이 없으면 null로 설정
+//            workItem.setSign(null);
+//        }
+    // Sign이 존재하면 Sign을 가져와서 WorkItem에 설정합니다.
+    if (workItemDto.getSignId() != null && workItemDto.getSignId() > 0) {
+        Sign sign = signRepository.findById(workItemDto.getSignId())
+                .orElseThrow(() -> new IllegalArgumentException("Sign not found with id: " + workItemDto.getSignId()));
+        workItem.setSign(sign);
+    } else if (workItemDto.getSignId() == null) {
+        // Sign이 null이면 기존 Sign을 유지합니다.
+        workItem.setSign(workItem.getSign());
+    }
 
         //WorkItemDto의 필드를 업데이트한다.
         if(workItemDto.getType() != null){
