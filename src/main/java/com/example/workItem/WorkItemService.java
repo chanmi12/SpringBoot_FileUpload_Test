@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -250,6 +251,8 @@ public class WorkItemService {
         work.setUpdateDate(LocalDateTime.now());
         workRepository.save(work);
 
+        updateWorkFinishStatus(workItem.getWork().getId());
+
         return workItemMapper.toDto(updatedWorkItem);
     }
 
@@ -284,12 +287,17 @@ public void deleteWorkItem(Long workItemId) {
 
     }
     // 작업 항목 완료 상태 업데이트
-    private void updateWorkFinishedStatus(Work work) {
-        boolean allWorkItemsFinished = workItemRepository.findByWorkIdAndAutoCreatedFalse(work.getId())
-                .stream()
-                .allMatch(WorkItem::getFinished);
-        work.setFinish(allWorkItemsFinished);
-        workRepository.save(work);
+    @Transactional
+    public  void updateWorkFinishStatus(Long workId) {
+        List<WorkItem> workItems = workItemRepository.findByWorkIdAndAutoCreatedFalse(workId);
+        boolean allFinished = workItems.stream().allMatch(WorkItem::getFinished);
+
+        Optional<Work> workOpt = workRepository.findById(workId);
+        if (workOpt.isPresent()) {
+            Work work = workOpt.get();
+            work.setFinish(allFinished);
+            workRepository.save(work);
+        }
     }
 
 

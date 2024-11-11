@@ -34,6 +34,7 @@ public class WorkService {
         work.setUserId(userId);
         work.setName(name);
         work.setPath(fileUrl);
+        work.setFinish(false);
         workRepository.save(work);
 
         return "File uploaded successfully. Work ID: " + work.getId();
