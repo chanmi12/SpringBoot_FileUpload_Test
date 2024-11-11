@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,4 +31,6 @@ public interface WorkItemRepository extends JpaRepository<WorkItem,Long> {
    // 작업 ID로 작업 항목 수를 반환하는 쿼리
     @Query("SELECT COUNT(DISTINCT wi.user.id) FROM WorkItem wi WHERE wi.work.id = :workId")
     int countDistinctUsersByWorkId(@Param("workId") Long workId);
+
+    List<WorkItem> findByWorkIdAndAutoCreatedFalse(Long workId);
 }

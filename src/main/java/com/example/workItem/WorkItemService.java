@@ -283,7 +283,14 @@ public void deleteWorkItem(Long workItemId) {
         workItemRepository.deleteAll(workItems);
 
     }
-
+    // 작업 항목 완료 상태 업데이트
+    private void updateWorkFinishedStatus(Work work) {
+        boolean allWorkItemsFinished = workItemRepository.findByWorkIdAndAutoCreatedFalse(work.getId())
+                .stream()
+                .allMatch(WorkItem::getFinished);
+        work.setFinish(allWorkItemsFinished);
+        workRepository.save(work);
+    }
 
 
 }
