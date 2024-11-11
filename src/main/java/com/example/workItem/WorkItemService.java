@@ -16,6 +16,7 @@ import com.example.user.User;
 import com.example.work.Work;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -188,14 +189,15 @@ public class WorkItemService {
                 .map(user -> new UserDto(user.getId(), user.getName(), user.getEmail())) // Convert User to UserDto
                 .collect(Collectors.toList()); // Collect as a list of UserDto
     }
-
+@Transactional
     public WorkItemDto updateWorkItem(Long workItemId, WorkItemDto workItemDto){ //ID로 작업 항목 업데이트
         //WorkItem 엔티티를 찾아서 가져온다.
         WorkItem workItem = workItemRepository.findById(workItemId)
                 .orElseThrow(() -> new IllegalArgumentException("WorkItem not found"));
         //Sign이 존재하면 Sign을 가져와서 WorkItem에 설정한다.
-        if (workItemDto.getSignId()!= null && workItemDto.getSignId()>0){
-            Sign sign = signRepository.findById(workItemDto.getSignId()).orElseThrow(()-> new IllegalArgumentException("Sign not found with id : "+ workItemDto.getSignId()));
+        if (workItemDto.getSignId() != null && workItemDto.getSignId() > 0) {
+            Sign sign = signRepository.findById(workItemDto.getSignId())
+                    .orElseThrow(() -> new IllegalArgumentException("Sign not found with id: " + workItemDto.getSignId()));
             workItem.setSign(sign);
         }else{//Sign이 없으면 null로 설정
             workItem.setSign(null);
@@ -241,8 +243,12 @@ public class WorkItemService {
         if (workItemDto.getFinished() != null) {
             workItem.setFinished(workItemDto.getFinished());
         }
-        //Save the updated WorkItem
+        //WorkItem 엔티티를 저장하고 업데이트된 엔티티를 WorkItemDto로 변환하여 반환한다.
        WorkItem updatedWorkItem = workItemRepository.save(workItem);
+        //Work의 업데이트 날짜를 현재 시간으로 설정한다.
+        Work work = workItem.getWork();
+        work.setUpdateDate(LocalDateTime.now());
+        workRepository.save(work);
 
         return workItemMapper.toDto(updatedWorkItem);
     }
