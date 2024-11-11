@@ -110,4 +110,8 @@ public class User {
     protected void onUpdate() {
         this.updateDate = LocalDateTime.now();
     }
+
+
+
+
 }

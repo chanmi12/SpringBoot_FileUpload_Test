@@ -14,4 +14,5 @@ public interface UserRepository extends JpaRepository<User,Long> {
     List<User> findByNameAndEmailContaining(String name, String email); // Filtered email search by name
     //학번으로 유저 조회
     Optional<User> findByUniqueId(String uniqueId);
+    Optional<User> findByNameAndEmail(String name, String email);
 }

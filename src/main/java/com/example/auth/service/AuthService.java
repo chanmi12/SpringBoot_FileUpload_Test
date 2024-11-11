@@ -65,10 +65,35 @@ public class AuthService {
                 .build();
     }
 
+    //    @Transactional
+//    public Long loginOrCreateUser(AuthDto authDto) {
+//        return userRepository.findByUniqueId(authDto.getUniqueId())
+//                .map(user -> {
+//                    user.updateLoginTime();
+//                    return user.getId();
+//                })
+//                .orElseGet(() -> {
+//                    User newUser = new User(authDto);
+//                    newUser.updateLoginTime();
+//                    userRepository.save(newUser);
+//                    return newUser.getId();
+//                });
+//    }
+    //로그인한 유저가 이미 존재하는 유저인지 확인하고 존재하지 않으면 새로 생성
     @Transactional
     public Long loginOrCreateUser(AuthDto authDto) {
+        //이름과 이메일로 유저 조회
+        Optional<User> userOpt = userRepository.findByNameAndEmail(authDto.getName(), authDto.getEmail());
+        //유저가 존재하면 정보 업데이트
+        if(userOpt.isPresent()) {
+        User user = userOpt.get();
+        user.update(authDto);
+        user.updateLoginTime();
+        return user.getId();
+    }else {
+            //유저가 존재하지 않으면 새로 생성
         return userRepository.findByUniqueId(authDto.getUniqueId())
-                .map(user -> {
+                .map(user-> {
                     user.updateLoginTime();
                     return user.getId();
                 })
@@ -78,6 +103,7 @@ public class AuthService {
                     userRepository.save(newUser);
                     return newUser.getId();
                 });
+       }
     }
 
 }
