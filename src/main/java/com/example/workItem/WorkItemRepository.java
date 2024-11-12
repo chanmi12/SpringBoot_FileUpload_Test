@@ -29,7 +29,8 @@ public interface WorkItemRepository extends JpaRepository<WorkItem,Long> {
 
     // AutoCreate가 false인 작업 ID 및 사용자 ID로 모든 작업 항목 찾기
     List<WorkItem> findByWorkIdAndUserIdAndAutoCreatedFalse(Long workId, Long userId);
-
+    // AutoCreate가 true인 작업 ID 및 사용자 ID로 모든 작업 항목 찾기
+    List<WorkItem> findByWorkIdAndUserIdAndAutoCreatedTrue(Long workId, Long userId);
    // 작업 ID로 작업 항목 수를 반환하는 쿼리
     @Query("SELECT COUNT(DISTINCT wi.user.id) FROM WorkItem wi WHERE wi.work.id = :workId")
     int countDistinctUsersByWorkId(@Param("workId") Long workId);
@@ -38,4 +39,6 @@ public interface WorkItemRepository extends JpaRepository<WorkItem,Long> {
 
     @Query("SELECT wi FROM WorkItem wi WHERE wi.work.id = :workId AND wi.autoCreated = false")
     List<WorkItem> findNonAutoCreatedWorkItemsByWorkId(@Param("workId") Long workId);
+
+
 }

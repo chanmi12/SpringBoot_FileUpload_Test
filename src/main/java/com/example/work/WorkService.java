@@ -1,6 +1,7 @@
 package com.example.work;
 
 import com.example.awsS3.AwsS3Service;
+import com.example.workItem.WorkItem;
 import com.example.workItem.WorkItemRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -206,14 +207,37 @@ public class WorkService {
                 .map(work -> workMapper.toDto(work, getUserCount(work.getId())))
                 .collect(Collectors.toList());
     }
-    //생성자는 상관이 없다. 공유된 Work 조회
+    //생성자는 상관이 없다. 공유된 Work 조회\
+//    @Transactional
+//    public List<WorkDto> getWorksSharedWithUserNotTrashed(Long userId) {
+//        // 특정 사용자 ID로 공유되었지만 삭제되지 않은 Work 항목을 찾기
+//        List<Work> worksSharedWithUser = workRepository.findWorksSharedWithUserNotTrashed(userId);
+//        // Work 목록을 스트림으로 처리하고, 각 Work 항목을 업데이트한 후 WorkDto로 변환
+//        return worksSharedWithUser.stream().
+//        map(work -> {
+//            // 사용자의 WorkItems 상태에 따라 자동 생성된 WorkItems의 상태를 업데이트
+//            updateAutoCreatedWorkItems(work.getId(), userId);
+//            // 'Work' 객체를 'WorkDto' 객체로 변환하고 해당 작업의 사용자 수를 포함
+//            return workMapper.toDto(work, getUserCount(work.getId()));
+//        })
+//                .collect(Collectors.toList());// 결과를 WorkDto 리스트로 수집
+//    }
     @Transactional
-    public List<WorkDto> getWorksSharedWithUserNotTrashed(Long userId) {
+    public List<WorkWithStatusDto> getWorksSharedWithUserNotTrashed(Long userId) {
         List<Work> worksSharedWithUser = workRepository.findWorksSharedWithUserNotTrashed(userId);
         return worksSharedWithUser.stream()
-                .map(work -> workMapper.toDto(work, getUserCount(work.getId())))
+                .map(work -> {
+                    boolean userFinished = checkUserFinishedStatus(work.getId(), userId);
+                    return workMapper.toWorkWithStatusDto(work, getUserCount(work.getId()), userFinished);
+                })
                 .collect(Collectors.toList());
     }
+    @Transactional
+    public boolean checkUserFinishedStatus(Long workId, Long userId) {
+        List<WorkItem> userWorkItems = workItemRepository.findByWorkIdAndUserIdAndAutoCreatedFalse(workId, userId);
+        return userWorkItems.stream().allMatch(WorkItem::getFinished);
+    }
+
     //Work 상세 조회
     public WorkDto getWorkDetails(Long workId) {
         Optional<Work> workOpt = workRepository.findById(workId);

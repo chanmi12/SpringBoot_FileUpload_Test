@@ -130,8 +130,8 @@ public class WorkController{
     }
     //생성자 상관없이, 공유된 작업 조회
     @GetMapping("/{userId}/works/sharedWithMe")
-    public ResponseEntity<List<WorkDto>> getWorksSharedWithUser(@PathVariable Long userId){
-        List<WorkDto> sharedWorks = workService.getWorksSharedWithUserNotTrashed(userId);
+    public ResponseEntity<List<WorkWithStatusDto>> getWorksSharedWithUser(@PathVariable Long userId) {
+        List<WorkWithStatusDto> sharedWorks = workService.getWorksSharedWithUserNotTrashed(userId);
         return ResponseEntity.ok(sharedWorks);
     }
     //작업 상세 조회

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 public class WorkMapper {
 
     //WorkDto 객체를 Work 객체로 변환
+
     public WorkDto toDto(Work work, int userCount) {
         if (work == null) {
             return null;
@@ -24,9 +25,32 @@ public class WorkMapper {
                 work.getUpdateDate(),
                 work.getOpenDate(),
                 work.getDeleteDate(),
-                userCount // userCount 설정
+                userCount // userCount 설정,
         );
     }
+    public WorkWithStatusDto toWorkWithStatusDto(Work work, int userCount, boolean  userFinished) {
+        if (work == null) {
+            return null;
+        }
+        return new WorkWithStatusDto(
+                work.getId(),
+                work.getUserId(),
+                work.getName(),
+                work.getPath(),
+                work.getXSize(),
+                work.getYSize(),
+                work.getShared(),
+                work.getTrashed(),
+                work.getFinish(),
+                work.getCreateDate(),
+                work.getUpdateDate(),
+                work.getOpenDate(),
+                work.getDeleteDate(),
+                userCount,
+                userFinished
+        );
+    }
+
 
     public static Work toEntity(WorkDto workDto) {
         if (workDto == null) {
