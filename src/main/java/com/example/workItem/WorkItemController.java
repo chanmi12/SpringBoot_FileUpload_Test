@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/OurSign/api")
+@RequestMapping("/api")
 @CrossOrigin(origins = {"http://localhost:3000", "https://oursign.vercel.app/"})
 public class WorkItemController {
 
