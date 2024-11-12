@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "https://oursign.vercel.app/"})
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -28,5 +28,5 @@ public ResponseEntity<Long> login(@RequestBody LoginRequest request) {
     Long userId = authService.loginOrCreateUser(authDto);
     // User의 ID를 반환
     return ResponseEntity.ok(userId);
-}
+    }
 }

@@ -14,12 +14,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
+
+@CrossOrigin(origins = {"http://localhost:3000", "https://oursign.vercel.app/"})
 @RequiredArgsConstructor
 public class WorkController{
 
     private final WorkService workService;
-
     //파일업로드 (create)
     @PostMapping ("/{userId}/works/upload")
     public ResponseEntity<String> uploadWork(
