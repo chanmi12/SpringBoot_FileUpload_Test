@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/OurSign/api")
 @CrossOrigin(origins = {"http://localhost:3000", "https://oursign.vercel.app/"})
 public class WorkItemController {
 
@@ -25,8 +25,8 @@ public class WorkItemController {
     private WorkService workService;
     @Autowired
     private SignService signService;
-@Autowired
-private WorkItemMapper workItemMapper;
+    @Autowired
+    private WorkItemMapper workItemMapper;
     //workId에 해당하는 work에 userDto를 초대
     @PostMapping("/{userId}/{workId}/workItem/invite")
     public ResponseEntity<WorkItemDto> inviteUserToWork(@PathVariable Long userId,

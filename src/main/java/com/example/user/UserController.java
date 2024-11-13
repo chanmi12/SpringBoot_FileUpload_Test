@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/OurSign/api/users")
 @CrossOrigin(origins = {"http://localhost:3000", "https://oursign.vercel.app/"})
 public class UserController {
 

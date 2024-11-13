@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -12,9 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.util.UUID;
 
@@ -68,4 +67,19 @@ public class AwsS3Service { //파일을 AWS S3에 업로드하고 URL을 반환�
         String fileName = fileUrl.substring(fileUrl.lastIndexOf("/")+1);
         amazonS3.deleteObject(bucket, fileName);
     }
+    //파일 다운로드
+    public File downloadFile(String bucketName, String key) throws IOException {
+        S3Object s3Object = amazonS3.getObject(bucketName, key);
+        InputStream inputStream = s3Object.getObjectContent();
+        File file = new File(System.getProperty("java.io.tmpdir") + "/" + key);
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            byte[] read_buf = new byte[1024];
+            int read_len;
+            while ((read_len = inputStream.read(read_buf)) > 0) {
+                outputStream.write(read_buf, 0, read_len);
+            }
+        }
+        return file;
+    }
+
 }

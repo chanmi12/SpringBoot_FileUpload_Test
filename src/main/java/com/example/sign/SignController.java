@@ -13,7 +13,7 @@ import java.util.List;
 
 @CrossOrigin(origins = {"http://localhost:3000", "https://oursign.vercel.app/"})
 @RestController
-@RequestMapping("/api/{userId}/sign")
+@RequestMapping("/OurSign/api/{userId}/sign")
 @RequiredArgsConstructor
 public class SignController {
 
