@@ -13,7 +13,7 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/OurSign/api")
+@RequestMapping("/api")
 
 @CrossOrigin(origins = {"http://localhost:3000", "https://oursign.vercel.app/"})
 @RequiredArgsConstructor
@@ -87,7 +87,8 @@ public class WorkController{
                 : ResponseEntity.status(404).body("Work ID " + id + " not found for user " + userId);
     }
     //모든 파일 조회
-    @GetMapping("/works/all")
+        @GetMapping("/works/all")
+//    @GetMapping(value = "/works/all", produces = "application/json")
     public ResponseEntity<List<WorkDto>> getAllWorks() {
         List<WorkDto> works = workService.getAllWorks();
         return ResponseEntity.ok(works);
