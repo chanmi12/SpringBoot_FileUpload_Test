@@ -11,7 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.*;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Service
@@ -53,13 +55,14 @@ public class AwsS3Service { //파일을 AWS S3에 업로드하고 URL을 반환�
         }
     }
 
-    private String encodeFileName(String fileName) {
+    public String encodeFileName(String fileName) {
         try {
-            return URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+            return URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
         } catch (UnsupportedEncodingException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File name encoding failed.");
         }
     }
+
     public void deleteFileFromS3(String fileUrl){
         String fileName = fileUrl.substring(fileUrl.lastIndexOf("/")+1);
         amazonS3.deleteObject(bucket, fileName);
@@ -82,17 +85,28 @@ public class AwsS3Service { //파일을 AWS S3에 업로드하고 URL을 반환�
         String bucketUrl = "https://swteam24-significant.s3.ap-northeast-2.amazonaws.com/";
         return url.replace(bucketUrl, "");
     }
-    public InputStream getFileAsStream(String s3Url) {
-        String key = extractKeyFromUrl(s3Url);  // URL에서 키만 추출
+    public InputStream getFileAsStream(String s3Path) {
         try {
+            // Extract and decode the S3 key from the provided URL
+            String key = extractS3Key(s3Path);
             S3Object s3Object = amazonS3.getObject(bucket, key);
             return s3Object.getObjectContent();
+        } catch (UnsupportedEncodingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "URL decoding failed.");
         } catch (AmazonS3Exception e) {
-            if (e.getStatusCode() == 404) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "S3에 해당 파일이 존재하지 않습니다: " + key);
-            }
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일을 불러오는 중 오류가 발생했습니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "S3에 해당 파일이 존재하지 않습니다: " + s3Path);
         }
+    }
+
+    private String extractS3Key(String s3Path) throws UnsupportedEncodingException {
+        // Extract only the path after .com/
+        String key = s3Path;
+        if (s3Path.contains("amazonaws.com")) {
+            key = s3Path.substring(s3Path.indexOf(".com/") + 5);
+        }
+
+        // Decode the key
+        return URLDecoder.decode(key, StandardCharsets.UTF_8.toString());
     }
 
 }

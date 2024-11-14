@@ -238,6 +238,7 @@ public class WorkService {
         return userWorkItems.stream().allMatch(WorkItem::getFinished);
     }
 
+    @Transactional
     //Work 상세 조회
     public WorkDto getWorkDetails(Long workId) {
         Optional<Work> workOpt = workRepository.findById(workId);
@@ -247,7 +248,7 @@ public class WorkService {
         Work work = workOpt.get();
         return workMapper.toDto(work, getUserCount(work.getId()));
     }
-
+    @Transactional
     public Work getWorkById(Long workId){
         Optional<Work> workOpt = workRepository.findById(workId);
         if(!workOpt.isPresent()){

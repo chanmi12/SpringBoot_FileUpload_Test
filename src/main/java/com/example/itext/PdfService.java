@@ -34,50 +34,47 @@ public class PdfService {
     public ByteArrayInputStream generatePdf(Long workId) throws IOException, DocumentException {
         // Load the base PDF from S3 using the Work path
         Work work = workService.getWorkById(workId);
-        InputStream basePdfStream = awsS3Service.getFileAsStream(work.getPath());
+        String workPath = work.getPath();
+        InputStream basePdfStream = awsS3Service.getFileAsStream(workPath);
 
-        // Read the existing PDF
         PdfReader pdfReader = new PdfReader(basePdfStream);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfStamper pdfStamper = new PdfStamper(pdfReader, baos);
         PdfContentByte content;
 
-        // Set font for text, using Helvetica for clarity
+        // Set font for text
         BaseFont baseFont = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.EMBEDDED);
-
-        // Get the dimensions of the PDF page
-        float pdfWidth = pdfReader.getPageSize(1).getWidth();
 
         // Retrieve WorkItems and process each based on type
         List<WorkItem> workItems = workItemService.findWorksSharedWithUserNotTrashed(workId);
         for (WorkItem workItem : workItems) {
-            content = pdfStamper.getOverContent(1);  // Adding to the first page
+            content = pdfStamper.getOverContent(1);
 
-            // Calculate the flipped x-coordinate only, keeping y-coordinate as is
-            float xPosition = pdfWidth - workItem.getXPosition();
-            float yPosition = workItem.getYPosition(); // y-coordinate remains unchanged
+            float xPosition = workItem.getXPosition();
+            float yPosition = workItem.getYPosition();
 
             switch (workItem.getType()) {
                 case 1: // Signature
                 case 3:
                     if (workItem.getSign() != null) {
-                        InputStream signImageStream = awsS3Service.getFileAsStream(workItem.getSign().getPath());
+                        String signPath = workItem.getSign().getPath();
+                        InputStream signImageStream = awsS3Service.getFileAsStream(signPath);
                         Image signImage = Image.getInstance(signImageStream.readAllBytes());
 
-                        // Set the position and scale for high quality
+                        // Set image position and size
                         signImage.setAbsolutePosition(xPosition, yPosition);
-                        signImage.scaleToFit(100, 50); // Adjust size if needed
+                        signImage.scaleToFit(100, 50);
                         content.addImage(signImage);
                     }
                     break;
 
                 case 2: // Text
                 case 4:
-                    content.beginText(); // Start text addition
-                    content.setFontAndSize(baseFont, 12); // Set font and size for clarity
-                    content.setTextMatrix(xPosition, yPosition); // Set text position
-                    content.showText(workItem.getText()); // Show text from WorkItem
-                    content.endText(); // End text addition
+                    content.beginText();
+                    content.setFontAndSize(baseFont, 12);
+                    content.setTextMatrix(xPosition, yPosition);
+                    content.showText(workItem.getText());
+                    content.endText();
                     break;
 
                 default:
@@ -85,10 +82,9 @@ public class PdfService {
             }
         }
 
-        pdfStamper.close(); // Close the PdfStamper
-        pdfReader.close(); // Close the PdfReader
+        pdfStamper.close();
+        pdfReader.close();
 
-        // Return the generated PDF as a ByteArrayInputStream
         return new ByteArrayInputStream(baos.toByteArray());
     }
 }

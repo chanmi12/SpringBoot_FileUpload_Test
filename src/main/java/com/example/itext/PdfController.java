@@ -29,7 +29,7 @@ public class PdfController {
     @Autowired
     private WorkItemService workItemService;
 
-//    @GetMapping("/generatePdf/{workId}")  // 경로 /api/generatePdf/{workId}
+    //    @GetMapping("/generatePdf/{workId}")  // 경로 /api/generatePdf/{workId}
 //    public ResponseEntity<InputStreamResource> generatePdf(@PathVariable Long workId) {
 //        try {
 //            ByteArrayInputStream pdfStream = pdfService.generatePdf(workId);
@@ -49,24 +49,30 @@ public class PdfController {
 //                    .body(new InputStreamResource(new ByteArrayInputStream("PDF 생성 실패".getBytes())));
 //        }
 //    }
-@GetMapping("/generatePdf/{workId}")
-public ResponseEntity<InputStreamResource> generatePdf(@PathVariable Long workId) {
-    try {
-        ByteArrayInputStream pdfStream = pdfService.generatePdf(workId);
+    @GetMapping("/generatePdf/{workId}")
+    public ResponseEntity<byte[]> generatePdf(@PathVariable Long workId) {
+        try {
+            // Generate the PDF as an InputStream
+            ByteArrayInputStream pdfStream = pdfService.generatePdf(workId);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename=generated_pdf.pdf");
+            // Convert InputStream to a byte array
+            byte[] pdfBytes = pdfStream.readAllBytes();
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(new InputStreamResource(pdfStream));
+            // Prepare headers to prompt download in the browser
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=generated_work_" + workId + ".pdf");
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentLength(pdfBytes.length);
 
-    } catch (IOException | com.lowagie.text.DocumentException e) {
-        return ResponseEntity.status(500).build();
+            // Return ResponseEntity with the byte array as the body
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+        } catch (IOException | DocumentException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
-}
-
 
 
