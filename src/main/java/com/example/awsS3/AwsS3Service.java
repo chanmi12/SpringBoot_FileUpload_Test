@@ -1,10 +1,7 @@
 package com.example.awsS3;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -80,6 +77,22 @@ public class AwsS3Service { //파일을 AWS S3에 업로드하고 URL을 반환�
             }
         }
         return file;
+    }
+    public String extractKeyFromUrl(String url) {
+        String bucketUrl = "https://swteam24-significant.s3.ap-northeast-2.amazonaws.com/";
+        return url.replace(bucketUrl, "");
+    }
+    public InputStream getFileAsStream(String s3Url) {
+        String key = extractKeyFromUrl(s3Url);  // URL에서 키만 추출
+        try {
+            S3Object s3Object = amazonS3.getObject(bucket, key);
+            return s3Object.getObjectContent();
+        } catch (AmazonS3Exception e) {
+            if (e.getStatusCode() == 404) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "S3에 해당 파일이 존재하지 않습니다: " + key);
+            }
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일을 불러오는 중 오류가 발생했습니다.");
+        }
     }
 
 }
