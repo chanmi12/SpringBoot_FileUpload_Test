@@ -41,4 +41,5 @@ public interface WorkItemRepository extends JpaRepository<WorkItem,Long> {
     List<WorkItem> findNonAutoCreatedWorkItemsByWorkId(@Param("workId") Long workId);
 
 
+
 }

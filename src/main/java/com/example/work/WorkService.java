@@ -248,4 +248,13 @@ public class WorkService {
         return workMapper.toDto(work, getUserCount(work.getId()));
     }
 
+    public Work getWorkById(Long workId){
+        Optional<Work> workOpt = workRepository.findById(workId);
+        if(!workOpt.isPresent()){
+            throw new IllegalArgumentException("Work not found for given id");
+        }
+        return workOpt.get();
+    }
+
+
 }

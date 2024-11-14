@@ -311,4 +311,14 @@ public void deleteWorkItem(Long workItemId) {
     }
 
 
+    public List<WorkItem> getWorkItemsByWorkId(Long workId) {
+        if (!workRepository.existsById(workId)) {
+            throw new IllegalArgumentException("Work ID " + workId + " does not exist.");
+        }
+        return workItemRepository.findByWorkId(workId);
+    }
+    public List<WorkItem> findWorksSharedWithUserNotTrashed(Long workId) {
+        // workId와 autoCreate == false 조건을 만족하는 WorkItem 가져오기
+        return workItemRepository.findByWorkIdAndAutoCreatedFalse(workId);
+    }
 }
