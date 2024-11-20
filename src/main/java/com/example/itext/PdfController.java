@@ -72,6 +72,21 @@ public class PdfController {
             return ResponseEntity.internalServerError().build();
         }
     }
+//    @GetMapping("/generatePdf/{workId}")
+//    public ResponseEntity<InputStreamResource> generatePdf(@PathVariable Long workId) {
+//        try {
+//            ByteArrayInputStream pdfStream = pdfService.generatePdf(workId);
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=generated_work_" + workId + ".pdf");
+//
+//            return ResponseEntity.ok()
+//                    .headers(headers)
+//                    .contentType(MediaType.APPLICATION_PDF)
+//                    .body(new InputStreamResource(pdfStream));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 }
 
 

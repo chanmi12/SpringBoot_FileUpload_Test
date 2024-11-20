@@ -87,4 +87,39 @@ public class PdfService {
 
         return new ByteArrayInputStream(baos.toByteArray());
     }
+
+//    @Transactional
+//    public ByteArrayInputStream generatePdf(Long workId) throws IOException, DocumentException {
+//        // Load Work and WorkItems
+//        Work work = workService.getWorkById(workId);
+//        InputStream basePdfStream = awsS3Service.getFileAsStream(work.getPath());
+//
+//        PdfReader pdfReader = new PdfReader(basePdfStream);
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        PdfStamper pdfStamper = new PdfStamper(pdfReader, baos);
+//        PdfContentByte content = pdfStamper.getOverContent(1); // Edit the first page
+//
+//        BaseFont baseFont = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.EMBEDDED);
+//
+//        // Process WorkItems
+//        for (WorkItem workItem : work.getWorkItems()) {
+//            if (workItem.getType() == 1 || workItem.getType() == 3) { // Signatures
+//                InputStream signImageStream = awsS3Service.getFileAsStream(workItem.getSign().getPath());
+//                Image signImage = Image.getInstance(signImageStream.readAllBytes());
+//                signImage.setAbsolutePosition(workItem.getXPosition(), workItem.getYPosition());
+//                signImage.scaleToFit(100, 50);
+//                content.addImage(signImage);
+//            } else if (workItem.getType() == 2 || workItem.getType() == 4) { // Text
+//                content.beginText();
+//                content.setFontAndSize(baseFont, 12);
+//                content.setTextMatrix(workItem.getXPosition(), workItem.getYPosition());
+//                content.showText(workItem.getText());
+//                content.endText();
+//            }
+//        }
+//
+//        pdfStamper.close();
+//        pdfReader.close();
+//        return new ByteArrayInputStream(baos.toByteArray());
+//    }
 }

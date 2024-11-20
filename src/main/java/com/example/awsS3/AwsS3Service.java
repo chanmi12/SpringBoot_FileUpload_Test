@@ -45,7 +45,6 @@ public class AwsS3Service { //파일을 AWS S3에 업로드하고 URL을 반환�
         }
         return amazonS3.getUrl(bucket, key).toString();
     }
-
     public String encodeFileName(String fileName) {
         try {
             return URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
@@ -54,6 +53,7 @@ public class AwsS3Service { //파일을 AWS S3에 업로드하고 URL을 반환�
         }
     }
 
+//
     public void deleteFileFromS3(String fileUrl) {
         String key = decodeKeyFromUrl(fileUrl);
         amazonS3.deleteObject(bucket, key);
@@ -83,4 +83,17 @@ public class AwsS3Service { //파일을 AWS S3에 업로드하고 URL을 반환�
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "URL decoding failed.");
         }
     }
+//public String decodeKeyFromUrl(String s3Path) {
+//    try {
+//        String bucketUrl = amazonS3.getUrl(bucket, "").toString();
+//        if (s3Path.startsWith(bucketUrl)) {
+//            String key = s3Path.substring(bucketUrl.length());
+//            return URLDecoder.decode(key, StandardCharsets.UTF_8.toString());
+//        } else {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid S3 file URL format.");
+//        }
+//    } catch (UnsupportedEncodingException e) {
+//        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "URL decoding failed.");
+//    }
+//}
 }
