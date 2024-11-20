@@ -29,9 +29,8 @@ public class AwsS3Service { //파일을 AWS S3에 업로드하고 URL을 반환�
         return System.currentTimeMillis() + "_" + originalFilename;
     }
 
-    public String uploadFile(String folder, MultipartFile file){
+    public String uploadFile(String folder, MultipartFile file) {
         String fileName = createFileName(file.getOriginalFilename());
-        // 파일 이름을 UUID로 생성
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(file.getSize());
         objectMetadata.setContentType(file.getContentType());
@@ -47,14 +46,6 @@ public class AwsS3Service { //파일을 AWS S3에 업로드하고 URL을 반환�
         return amazonS3.getUrl(bucket, key).toString();
     }
 
-    private String getFileExtension(String fileName){ //파일의 확장자를 반환하는 메소드
-        try{
-            return fileName.substring(fileName.lastIndexOf(".")); //파일 이름에서 마지막 .의 위치부터 끝까지 반환
-        }catch (StringIndexOutOfBoundsException e){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 형시의 파일("+fileName+")입니다.");//예외 처리
-        }
-    }
-
     public String encodeFileName(String fileName) {
         try {
             return URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
@@ -63,50 +54,33 @@ public class AwsS3Service { //파일을 AWS S3에 업로드하고 URL을 반환�
         }
     }
 
-    public void deleteFileFromS3(String fileUrl){
-        String fileName = fileUrl.substring(fileUrl.lastIndexOf("/")+1);
-        amazonS3.deleteObject(bucket, fileName);
+    public void deleteFileFromS3(String fileUrl) {
+        String key = decodeKeyFromUrl(fileUrl);
+        amazonS3.deleteObject(bucket, key);
     }
-    //파일 다운로드
-    public File downloadFile(String bucketName, String key) throws IOException {
-        S3Object s3Object = amazonS3.getObject(bucketName, key);
-        InputStream inputStream = s3Object.getObjectContent();
-        File file = new File(System.getProperty("java.io.tmpdir") + "/" + key);
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
-            byte[] read_buf = new byte[1024];
-            int read_len;
-            while ((read_len = inputStream.read(read_buf)) > 0) {
-                outputStream.write(read_buf, 0, read_len);
-            }
-        }
-        return file;
-    }
-    public String extractKeyFromUrl(String url) {
-        String bucketUrl = "https://swteam24-significant.s3.ap-northeast-2.amazonaws.com/";
-        return url.replace(bucketUrl, "");
-    }
+
     public InputStream getFileAsStream(String s3Path) {
         try {
-            // Extract and decode the S3 key from the provided URL
-            String key = extractS3Key(s3Path);
+            String key = decodeKeyFromUrl(s3Path);
             S3Object s3Object = amazonS3.getObject(bucket, key);
             return s3Object.getObjectContent();
-        } catch (UnsupportedEncodingException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "URL decoding failed.");
         } catch (AmazonS3Exception e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "S3에 해당 파일이 존재하지 않습니다: " + s3Path);
         }
     }
 
-    private String extractS3Key(String s3Path) throws UnsupportedEncodingException {
-        // Extract only the path after .com/
-        String key = s3Path;
-        if (s3Path.contains("amazonaws.com")) {
-            key = s3Path.substring(s3Path.indexOf(".com/") + 5);
+    private String decodeKeyFromUrl(String s3Path) {
+        try {
+            // Construct the base URL dynamically
+            String bucketUrl = amazonS3.getUrl(bucket, "").toString();
+            if (s3Path.startsWith(bucketUrl)) {
+                String key = s3Path.substring(bucketUrl.length());
+                return URLDecoder.decode(key, StandardCharsets.UTF_8.toString());
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid S3 file URL format: " + s3Path);
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "URL decoding failed.");
         }
-
-        // Decode the key
-        return URLDecoder.decode(key, StandardCharsets.UTF_8.toString());
     }
-
 }

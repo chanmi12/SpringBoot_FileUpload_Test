@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +32,9 @@ public class WorkService {
         if (file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty");
         }
+//        String encodedFileName = URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8);
         String fileUrl = awsS3Service.uploadFile("file", file);
+
         Work work = new Work();
         work.setUserId(userId);
         work.setName(name);
