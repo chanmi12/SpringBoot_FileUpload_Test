@@ -50,24 +50,23 @@ public class PdfController {
 //        }
 //    }
     @GetMapping("/generatePdf/{workId}")
-    public ResponseEntity<byte[]> generatePdf(@PathVariable Long workId) {
+    public ResponseEntity<byte[]> generatePdf(@PathVariable Long workId)  {
         try {
-            // Generate the PDF as an InputStream
+            // Generate the PDF as a ByteArrayInputStream
             ByteArrayInputStream pdfStream = pdfService.generatePdf(workId);
 
-            // Convert InputStream to a byte array
+            // Convert InputStream to byte array
             byte[] pdfBytes = pdfStream.readAllBytes();
 
-            // Prepare headers to prompt download in the browser
+            // Prepare headers to indicate PDF content and inline display
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=generated_work_" + workId + ".pdf");
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=generated_work_" + workId + ".pdf");
             headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentLength(pdfBytes.length);
 
-            // Return ResponseEntity with the byte array as the body
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(pdfBytes);
+
         } catch (IOException | DocumentException e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
