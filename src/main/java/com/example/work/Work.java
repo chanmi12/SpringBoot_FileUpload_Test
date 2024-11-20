@@ -24,6 +24,7 @@ public class Work {
     private Long userId;
 
     private String name;
+    @Column(length = 1024)
     private String path; // S3 path
 
     private Integer xSize;
