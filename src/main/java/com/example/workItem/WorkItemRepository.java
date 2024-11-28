@@ -34,12 +34,13 @@ public interface WorkItemRepository extends JpaRepository<WorkItem,Long> {
    // 작업 ID로 작업 항목 수를 반환하는 쿼리
     @Query("SELECT COUNT(DISTINCT wi.user.id) FROM WorkItem wi WHERE wi.work.id = :workId")
     int countDistinctUsersByWorkId(@Param("workId") Long workId);
-
+    // 작업 ID로 AutoCreate가 false인 모든 작업 항목을 반환하는 쿼리
     List<WorkItem> findByWorkIdAndAutoCreatedFalse(Long workId);
 
+    // 작업 ID로 AutoCreate가 false인 모든 작업 항목을 반환하는 쿼리
     @Query("SELECT wi FROM WorkItem wi WHERE wi.work.id = :workId AND wi.autoCreated = false")
     List<WorkItem> findNonAutoCreatedWorkItemsByWorkId(@Param("workId") Long workId);
 
-
-
+    //작업 ID로 완료된 모든 작업 항목을 반환하는 쿼리
+    List<WorkItem> findByWorkIdAndFinishedTrueAndAutoCreatedFalse(Long workId);
 }

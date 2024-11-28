@@ -1,11 +1,18 @@
 package com.example.work;
 
+import com.example.itext.Itext;
+import com.example.itext.ItextDto;
 import org.springframework.stereotype.Component;
-
+import com.example.itext.ItextMapper;
 @Component
 public class WorkMapper {
 
     //WorkDto 객체를 Work 객체로 변환
+    private final ItextMapper itextMapper;
+
+    public WorkMapper(ItextMapper itextMapper) {
+        this.itextMapper = itextMapper;
+    }
 
     public WorkDto toDto(Work work, int userCount) {
         if (work == null) {
@@ -25,10 +32,12 @@ public class WorkMapper {
                 work.getUpdateDate(),
                 work.getOpenDate(),
                 work.getDeleteDate(),
-                userCount // userCount 설정,
+                userCount,
+                work.getItext() != null ? itextMapper.toDto(work.getItext()) : null // Map Itext if present
         );
     }
-    public WorkWithStatusDto toWorkWithStatusDto(Work work, int userCount, boolean  userFinished) {
+
+    public WorkWithStatusDto toWorkWithStatusDto(Work work, int userCount, boolean userFinished) {
         if (work == null) {
             return null;
         }
@@ -51,8 +60,7 @@ public class WorkMapper {
         );
     }
 
-
-    public static Work toEntity(WorkDto workDto) {
+    public Work toEntity(WorkDto workDto) {
         if (workDto == null) {
             return null;
         }
@@ -70,6 +78,10 @@ public class WorkMapper {
         work.setUpdateDate(workDto.getUpdateDate());
         work.setOpenDate(workDto.getOpenDate());
         work.setDeleteDate(workDto.getDeleteDate());
+        if (workDto.getItext() != null) {
+            Itext itext = itextMapper.toEntity(workDto.getItext(), work);
+            work.setItext(itext);
+        }
         return work;
     }
 
@@ -95,17 +107,16 @@ public class WorkMapper {
         if (workDto.getFinish() != null) {
             existingWork.setFinish(workDto.getFinish());
         }
-        if (workDto.getCreateDate() != null) {
-            existingWork.setCreateDate(workDto.getCreateDate());
-        }
-        if (workDto.getUpdateDate() != null) {
-            existingWork.setUpdateDate(workDto.getUpdateDate());
-        }
         if (workDto.getOpenDate() != null) {
             existingWork.setOpenDate(workDto.getOpenDate());
         }
         if (workDto.getDeleteDate() != null) {
             existingWork.setDeleteDate(workDto.getDeleteDate());
+        }
+        if (workDto.getItext() != null) {
+            // Map Itext only if it's not null
+            Itext itextEntity = itextMapper.toEntity(workDto.getItext(), existingWork); // Pass the associated Work
+            existingWork.setItext(itextEntity);
         }
     }
 }

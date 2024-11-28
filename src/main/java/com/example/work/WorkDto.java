@@ -1,5 +1,6 @@
 package com.example.work;
 
+import com.example.itext.ItextDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,4 +28,5 @@ public class WorkDto {
     private LocalDateTime openDate;
     private LocalDateTime deleteDate;
     private Integer userCount;
+    private ItextDto itext;
 }

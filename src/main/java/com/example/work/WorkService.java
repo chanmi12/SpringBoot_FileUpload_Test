@@ -1,6 +1,9 @@
 package com.example.work;
 
 import com.example.awsS3.AwsS3Service;
+import com.example.itext.Itext;
+import com.example.itext.ItextDto;
+import com.example.itext.ItextMapper;
 import com.example.workItem.WorkItem;
 import com.example.workItem.WorkItemRepository;
 import jakarta.transaction.Transactional;
@@ -27,6 +30,8 @@ public class WorkService {
     private WorkMapper workMapper;
     @Autowired
     WorkItemRepository workItemRepository;
+    @Autowired
+    private ItextMapper itextMapper;
     //Work 업로드
     public String uploadWork(Long userId, MultipartFile file, String name) {
         if (file.isEmpty()) {
@@ -259,6 +264,10 @@ public class WorkService {
             throw new IllegalArgumentException("Work not found for given id");
         }
         return workOpt.get();
+    }
+
+    public List<WorkItem> getCompletedWorkItemsByWorkId(Long workId) {
+        return workItemRepository.findByWorkIdAndFinishedTrueAndAutoCreatedFalse(workId);
     }
 
 

@@ -1,5 +1,6 @@
 package com.example.work;
 
+import com.example.itext.Itext;
 import com.example.workItem.WorkItem;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -49,6 +50,10 @@ public class Work {
 
     @OneToMany(mappedBy = "work", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkItem> workItems;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, optional = true)
+    @JoinColumn(name = "itext_id", referencedColumnName = "id", nullable = true)
+    private Itext itext;
 
     @PrePersist
     protected void onCreate() {
