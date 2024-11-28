@@ -29,7 +29,7 @@ public class AwsS3Service { //파일을 AWS S3에 업로드하고 URL을 반환�
         return System.currentTimeMillis() + "_" + originalFilename;
     }
 
-    public String uploadFile(String folder, MultipartFile file) {
+    public String uploadFile(String folder, MultipartFile file) { //파일을 업로드하고 URL을 반환
         String fileName = createFileName(file.getOriginalFilename());
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(file.getSize());
@@ -45,6 +45,7 @@ public class AwsS3Service { //파일을 AWS S3에 업로드하고 URL을 반환�
         }
         return amazonS3.getUrl(bucket, key).toString();
     }
+
     public String encodeFileName(String fileName) {
         try {
             return URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
