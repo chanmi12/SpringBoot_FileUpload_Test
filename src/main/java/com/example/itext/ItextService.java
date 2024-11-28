@@ -24,11 +24,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
@@ -49,6 +51,7 @@ public class ItextService {
      */
     @Transactional
     public ResponseEntity<ByteArrayResource> createOrUpdateAndDownloadItext(Long workId) {
+        // Fetch the Work entity
         Work work = workRepository.findById(workId)
                 .orElseThrow(() -> new IllegalArgumentException("Work not found with ID: " + workId));
         List<WorkItem> workItems = workItemRepository.findByWorkIdAndFinishedTrueAndAutoCreatedFalse(workId);
@@ -64,7 +67,9 @@ public class ItextService {
 
         Itext itext = work.getItext();
         String s3Path;
+
         if (itext == null) {
+            // Create new Itext
             ByteArrayOutputStream pdfOutputStream = generatePdf(workItems, workPath);
             s3Path = uploadPdfToS3(workId, pdfOutputStream);
 
@@ -76,6 +81,7 @@ public class ItextService {
             work.setItext(itext);
             workRepository.save(work);
         } else {
+            // Update existing Itext
             ByteArrayOutputStream pdfOutputStream = generatePdf(workItems, workPath);
             s3Path = uploadPdfToS3(workId, pdfOutputStream);
 
@@ -83,7 +89,11 @@ public class ItextService {
             itextRepository.save(itext);
         }
 
-        return downloadPdfFromS3(s3Path);
+        // Use Work.name from the database for the file name
+        String fileName = work.getName() + ".pdf";
+
+        // Return the file with the custom name
+        return downloadPdfFromS3(s3Path, fileName);
     }
 
     private ByteArrayOutputStream generatePdf(List<WorkItem> workItems, String workPath) {
@@ -141,7 +151,8 @@ public class ItextService {
     /**
      * 생성된 PDF 파일을 AWS S3에 업로드하고 URL 반환
      */
-    private String uploadPdfToS3(Long workId, ByteArrayOutputStream pdfOutputStream) {
+    @Transactional
+    public String uploadPdfToS3(Long workId, ByteArrayOutputStream pdfOutputStream) {
         String fileName = "itext/" + workId + "_work.pdf"; // 파일 경로 설정
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType("application/pdf");
@@ -159,22 +170,24 @@ public class ItextService {
     /**
      * S3에서 PDF 파일 다운로드
      */
-    private ResponseEntity<ByteArrayResource> downloadPdfFromS3(String s3Path) {
-        try (InputStream inputStream = awsS3Service.getFileAsStream(s3Path)) {
-            byte[] fileContent = inputStream.readAllBytes(); // 파일 내용 읽기
-            ByteArrayResource resource = new ByteArrayResource(fileContent);
+    @Transactional
+    public ResponseEntity<ByteArrayResource> downloadPdfFromS3(String s3Path, String originalFileName) {
+        try {
+            // AWS S3에서 파일 가져오기
+            InputStream inputStream = awsS3Service.getFileAsStream(s3Path);
+            ByteArrayResource resource = new ByteArrayResource(inputStream.readAllBytes());
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + s3Path.substring(s3Path.lastIndexOf("/") + 1)); // 파일 이름 설정
-            headers.setContentType(MediaType.APPLICATION_PDF); // PDF 콘텐츠 타입 설정
+            // 파일 이름 URL 인코딩
+            String encodedFileName = UriUtils.encode(originalFileName, StandardCharsets.UTF_8);
 
+            // UTF-8로 인코딩된 파일 이름을 Content-Disposition 헤더에 추가
             return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentLength(fileContent.length)
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .body(resource); // 파일 반환
+                    .header("Content-Type", "application/pdf")
+                    .header("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFileName)
+                    .contentLength(resource.contentLength())
+                    .body(resource);
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "PDF 다운로드 실패.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to download PDF", e);
         }
     }
 }
