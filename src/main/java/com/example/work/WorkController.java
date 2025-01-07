@@ -21,18 +21,24 @@ public class WorkController{
 
     private final WorkService workService;
     //파일업로드 (create)
-    @PostMapping ("/{userId}/works/upload")
+    @PostMapping("/{userId}/works/upload")
     public ResponseEntity<String> uploadWork(
             @PathVariable Long userId,
             @RequestParam("file") MultipartFile file,
             @RequestParam("name") String name) {
         try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("File is empty");
+            }
+
             String message = workService.uploadWork(userId, file, name);
-            return ResponseEntity.ok(message);
+            return ResponseEntity.ok("Work uploaded successfully. Work ID: " + message);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to upload file: " + e.getMessage());
         }
     }
+
 
     // 유저의 파일 목록 조회 (Read)
     @GetMapping("/{userId}/works/list")
